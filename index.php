@@ -55,243 +55,70 @@
 <!-- POPÜLER ÜRÜNLER -->
 <section id="populer" class="container py-5 mt-5" style="margin-top: 100px;">
   <h2 class="mb-4" style="font-family: 'Playfair Display', serif; font-size: 1.5rem;">Popüler Ürünler</h2>
-  
+
   <div class="d-flex overflow-auto gap-4 pb-3">
-  
-  <div class="col-6 col-md-4 col-lg-3 mb-4">
-  <div class="card product-card">
-    <img src="YA-Ürün Resimleri/takı3.jpeg" class="img-fluid d-block w-100" alt="Vintage Kolye">
-    <div class="card-body product-card-body d-flex flex-column">
-      <h5 class="card-title">Vintage Kolye</h5>
-      <p class="card-text mb-auto">249,99 TL</p>
-      <a href="#" class="btn float-end" style="background-color: #000; color: #fff;">Sepete Ekle</a>
-    </div>
+    <?php
+    include 'db_baglanti.php'; 
+    
+    $sql = "SELECT * FROM urun WHERE kategori_id = 7";
+    $result = $conn->query($sql);
+
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            echo '
+            <div class="col-6 col-md-4 col-lg-3 mb-4">
+              <div class="card product-card">
+                <img src="Resimler/' . $row['resim'] . '" class="img-fluid d-block w-100" alt="' . $row['urun_adi'] . '">
+                <div class="card-body product-card-body d-flex flex-column">
+                  <h5 class="card-title">' . $row['urun_adi'] . '</h5>
+                  <p class="card-text mb-auto">' . $row['fiyat'] . ' TL</p>
+                  <a href="#" class="btn float-end" style="background-color: #000; color: #fff;">Sepete Ekle</a>
+                </div>
+              </div>
+            </div>
+            ';
+        }
+    } else {
+        echo "<p>Popüler ürün bulunamadı.</p>";
+    }
+    ?>
   </div>
-</div>
-
-<div class="col-6 col-md-4 col-lg-3 mb-4">
-  <div class="card product-card">
-    <img src="YA-Ürün Resimleri/takı4.jpeg" class="img-fluid d-block w-100" alt="Kalp Charm Kolye">
-    <div class="card-body product-card-body d-flex flex-column">
-      <h5 class="card-title">Kalp Charm Kolye</h5>
-      <p class="card-text mb-auto">249,99 TL</p>
-      <a href="#" class="btn float-end" style="background-color: #000; color: #fff;">Sepete Ekle</a>
-    </div>
-  </div>
-</div>
-
-<div class="col-6 col-md-4 col-lg-3 mb-4">
-  <div class="card product-card">
-    <img src="YA-Ürün Resimleri/göz8.jpeg" class="img-fluid d-block w-100" alt="Şekilli Gözlük">
-    <div class="card-body product-card-body d-flex flex-column">
-      <h5 class="card-title">Şekilli Gözlük</h5>
-      <p class="card-text mb-auto">249,99 TL</p>
-      <a href="#" class="btn float-end" style="background-color: #000; color: #fff;">Sepete Ekle</a>
-    </div>
-  </div>
-</div>
-
-<div class="col-6 col-md-4 col-lg-3 mb-4">
-  <div class="card product-card">
-    <img src="YA-Ürün Resimleri/göz9.jpeg" class="img-fluid d-block w-100" alt="Nude Gözlük">
-    <div class="card-body product-card-body d-flex flex-column">
-      <h5 class="card-title">Nude Gözlük</h5>
-      <p class="card-text mb-auto">249,99 TL</p>
-      <a href="#" class="btn float-end" style="background-color: #000; color: #fff;">Sepete Ekle</a>
-    </div>
-  </div>
-</div>
-
-<div class="col-6 col-md-4 col-lg-3 mb-4">
-  <div class="card product-card">
-    <img src="YA-Ürün Resimleri/şapk1.jpeg" class="img-fluid d-block w-100" alt="Bağcıklı Hasır Şapka">
-    <div class="card-body product-card-body d-flex flex-column">
-      <h5 class="card-title">Bağcıklı Hasır Şapka</h5>
-      <p class="card-text mb-auto">249,99 TL</p>
-      <a href="#" class="btn float-end" style="background-color: #000; color: #fff;">Sepete Ekle</a>
-    </div>
-  </div>
-</div>
-
-<div class="col-6 col-md-4 col-lg-3 mb-4">
-  <div class="card product-card">
-    <img src="YA-Ürün Resimleri/şapk3.jpeg" class="img-fluid d-block w-100" alt="Peluş Bucket Şapka">
-    <div class="card-body product-card-body d-flex flex-column">
-      <h5 class="card-title">Peluş Bucket Şapka</h5>
-      <p class="card-text mb-auto">249,99 TL</p>
-      <a href="#" class="btn float-end" style="background-color: #000; color: #fff;">Sepete Ekle</a>
-    </div>
-  </div>
-</div>
-
-<div class="col-6 col-md-4 col-lg-3 mb-4">
-  <div class="card product-card">
-    <img src="YA-Ürün Resimleri/çanta3.jpeg" class="img-fluid d-block w-100" alt="Kumaş Cüzdan(L)">
-    <div class="card-body product-card-body d-flex flex-column">
-      <h5 class="card-title">Kumaş Cüzdan(L)</h5>
-      <p class="card-text mb-auto">249,99 TL</p>
-      <a href="#" class="btn float-end" style="background-color: #000; color: #fff;">Sepete Ekle</a>
-    </div>
-  </div>
-</div>
-
-<div class="col-6 col-md-4 col-lg-3 mb-4">
-  <div class="card product-card">
-    <img src="YA-Ürün Resimleri/çanta5.jpeg" class="img-fluid d-block w-100" alt="Fiyonk Hasır Şapka">
-    <div class="card-body product-card-body d-flex flex-column">
-      <h5 class="card-title">Fiyonk Hasır Çanta</h5>
-      <p class="card-text mb-auto">249,99 TL</p>
-      <a href="#" class="btn float-end" style="background-color: #000; color: #fff;">Sepete Ekle</a>
-    </div>
-  </div>
-</div>
-
-<div class="col-6 col-md-4 col-lg-3 mb-4">
-  <div class="card product-card">
-    <img src="YA-Ürün Resimleri/saç2.jpeg" class="img-fluid d-block w-100" alt="Deniz Kabuğu Toka">
-    <div class="card-body product-card-body d-flex flex-column">
-      <h5 class="card-title">Deniz Kabuğu Toka</h5>
-      <p class="card-text mb-auto">249,99 TL</p>
-      <a href="#" class="btn float-end" style="background-color: #000; color: #fff;">Sepete Ekle</a>
-    </div>
-  </div>
-</div>
-
-<div class="col-6 col-md-4 col-lg-3 mb-4">
-  <div class="card product-card">
-    <img src="YA-Ürün Resimleri/saç5.jpeg" class="img-fluid d-block w-100" alt="Gold Toka">
-    <div class="card-body product-card-body d-flex flex-column">
-      <h5 class="card-title">Gold Toka</h5>
-      <p class="card-text mb-auto">249,99 TL</p>
-      <a href="#" class="btn float-end" style="background-color: #000; color: #fff;">Sepete Ekle</a>
-    </div>
-  </div>
-</div>
-
-</div>
-
-
 </section>
 
 <!-- YENİ GELEN ÜRÜNLER -->
 
 <section id="yenigelen" class="container py-5 mt-0" style="margin-top: 100px;">
   <h2 class="mb-4" style="font-family: 'Playfair Display', serif; font-size: 1.5rem;">Yeni Gelen Ürünler</h2>
-  
+
   <div class="d-flex overflow-auto gap-4 pb-3">
-  <div class="col-6 col-md-4 col-lg-3 mb-4">
-  <div class="card product-card">
-    <img src="YA-Ürün Resimleri/takı2.jpeg" class="img-fluid d-block w-100" alt="Deniz Kabuğu Toka">
-    <div class="card-body product-card-body d-flex flex-column">
-      <h5 class="card-title">Deniz Kabuğu Kolye</h5>
-      <p class="card-text mb-auto">249,99 TL</p>
-      <a href="#" class="btn float-end" style="background-color: #000; color: #fff;">Sepete Ekle</a>
-    </div>
+    <?php
+    include 'db_baglanti.php'; 
+
+    $sql = "SELECT * FROM urun WHERE kategori_id = 8";
+    $result = $conn->query($sql);
+
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            echo '
+            <div class="col-6 col-md-4 col-lg-3 mb-4">
+              <div class="card product-card">
+                <img src="Resimler/' . $row['resim'] . '" class="img-fluid d-block w-100" alt="' . $row['urun_adi'] . '">
+                <div class="card-body product-card-body d-flex flex-column">
+                  <h5 class="card-title">' . $row['urun_adi'] . '</h5>
+                  <p class="card-text mb-auto">' . $row['fiyat'] . ' TL</p>
+                  <a href="#" class="btn float-end" style="background-color: #000; color: #fff;">Sepete Ekle</a>
+                </div>
+              </div>
+            </div>
+            ';
+        }
+    } else {
+        echo "<p>Yeni gelen ürün bulunamadı.</p>";
+    }
+    ?>
   </div>
-</div>
-
-<div class="col-6 col-md-4 col-lg-3 mb-4">
-  <div class="card product-card">
-    <img src="YA-Ürün Resimleri/takı6.jpeg" class="img-fluid d-block w-100" alt="Çiçek Desen Bileklik">
-    <div class="card-body product-card-body d-flex flex-column">
-      <h5 class="card-title">Çiçek Desen Bileklik</h5>
-      <p class="card-text mb-auto">249,99 TL</p>
-      <a href="#" class="btn float-end" style="background-color: #000; color: #fff;">Sepete Ekle</a>
-    </div>
-  </div>
-</div>
-
-<div class="col-6 col-md-4 col-lg-3 mb-4">
-  <div class="card product-card">
-    <img src="YA-Ürün Resimleri/göz5.jpeg" class="img-fluid d-block w-100" alt="Vintage Gözlük">
-    <div class="card-body product-card-body d-flex flex-column">
-      <h5 class="card-title">Vintage Gözlük</h5>
-      <p class="card-text mb-auto">249,99 TL</p>
-      <a href="#" class="btn float-end" style="background-color: #000; color: #fff;">Sepete Ekle</a>
-    </div>
-  </div>
-</div>
-
-<div class="col-6 col-md-4 col-lg-3 mb-4">
-  <div class="card product-card">
-    <img src="YA-Ürün Resimleri/göz10.jpeg" class="img-fluid d-block w-100" alt="Retro Gözlük">
-    <div class="card-body product-card-body d-flex flex-column">
-      <h5 class="card-title">Retro Gözlük</h5>
-      <p class="card-text mb-auto">249,99 TL</p>
-      <a href="#" class="btn float-end" style="background-color: #000; color: #fff;">Sepete Ekle</a>
-    </div>
-  </div>
-</div>
-
-<div class="col-6 col-md-4 col-lg-3 mb-4">
-  <div class="card product-card">
-    <img src="YA-Ürün Resimleri/şapk7.jpeg" class="img-fluid d-block w-100" alt="Renkli Bucket Şapka">
-    <div class="card-body product-card-body d-flex flex-column">
-      <h5 class="card-title">Renkli Bucket Şapka</h5>
-      <p class="card-text mb-auto">249,99 TL</p>
-      <a href="#" class="btn float-end" style="background-color: #000; color: #fff;">Sepete Ekle</a>
-    </div>
-  </div>
-</div>
-
-<div class="col-6 col-md-4 col-lg-3 mb-4">
-  <div class="card product-card">
-    <img src="YA-Ürün Resimleri/şapk8.jpeg" class="img-fluid d-block w-100" alt="Genç Bucket Şapka">
-    <div class="card-body product-card-body d-flex flex-column">
-      <h5 class="card-title">Genç Bucket Şapka</h5>
-      <p class="card-text mb-auto">249,99 TL</p>
-      <a href="#" class="btn float-end" style="background-color: #000; color: #fff;">Sepete Ekle</a>
-    </div>
-  </div>
-</div>
-
-<div class="col-6 col-md-4 col-lg-3 mb-4">
-  <div class="card product-card">
-    <img src="YA-Ürün Resimleri/çanta8.jpeg" class="img-fluid d-block w-100" alt="Pastel Mini Çanta">
-    <div class="card-body product-card-body d-flex flex-column">
-      <h5 class="card-title">Pastel Mini Çanta</h5>
-      <p class="card-text mb-auto">249,99 TL</p>
-      <a href="#" class="btn float-end" style="background-color: #000; color: #fff;">Sepete Ekle</a>
-    </div>
-  </div>
-</div>
-
-<div class="col-6 col-md-4 col-lg-3 mb-4">
-  <div class="card product-card">
-    <img src="YA-Ürün Resimleri/çanta9.jpeg" class="img-fluid d-block w-100" alt="Pastel Çapraz Çanta">
-    <div class="card-body product-card-body d-flex flex-column">
-      <h5 class="card-title">Pastel Çapraz Çanta</h5>
-      <p class="card-text mb-auto">249,99 TL</p>
-      <a href="#" class="btn float-end" style="background-color: #000; color: #fff;">Sepete Ekle</a>
-    </div>
-  </div>
-</div>
-
-<div class="col-6 col-md-4 col-lg-3 mb-4">
-  <div class="card product-card">
-    <img src="YA-Ürün Resimleri/saç8.jpeg" class="img-fluid d-block w-100" alt="Mavi Çiçek Toka">
-    <div class="card-body product-card-body d-flex flex-column">
-      <h5 class="card-title">Mavi Çiçek Toka</h5>
-      <p class="card-text mb-auto">249,99 TL</p>
-      <a href="#" class="btn float-end" style="background-color: #000; color: #fff;">Sepete Ekle</a>
-    </div>
-  </div>
-</div>
-
-<div class="col-6 col-md-4 col-lg-3 mb-4">
-  <div class="card product-card">
-    <img src="YA-Ürün Resimleri/saç12.jpeg" class="img-fluid d-block w-100" alt="Kirazlı Bandana">
-    <div class="card-body product-card-body d-flex flex-column">
-      <h5 class="card-title">Kirazlı Bandana</h5>
-      <p class="card-text mb-auto">249,99 TL</p>
-      <a href="#" class="btn float-end" style="background-color: #000; color: #fff;">Sepete Ekle</a>
-    </div>
-  </div>
-</div>
-
-</div>
-
 </section>
+
 
 <div class="container w-100 mt-3">
   <div class="card mx-auto">
