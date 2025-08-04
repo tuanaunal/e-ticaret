@@ -29,6 +29,10 @@ html {
   right: 10px;
  width: 150px;
 }
+.bi.bi-heart,
+.bi.bi-heart-fill {
+  color: black !important;
+}
 
 
 

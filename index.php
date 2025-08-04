@@ -1,3 +1,18 @@
+<?php
+session_start();
+include 'db_baglanti.php';
+
+$favoriler = [];
+if (isset($_SESSION['uye_id'])) {
+    $uye_id = $_SESSION['uye_id'];
+    $fav_sql = "SELECT urun_id FROM favori WHERE uye_id = $uye_id";
+    $fav_result = $conn->query($fav_sql);
+
+    while ($row = $fav_result->fetch_assoc()) {
+        $favoriler[] = $row['urun_id'];
+    }
+}
+?>
 <!DOCTYPE html>
 <html lang="tr">
 
@@ -16,7 +31,7 @@
 </head>
 
 <body data-bs-spy="scroll" data-bs-target="#navbar-example" data-bs-offset="100" tabindex="0">
-  
+
 <?php include 'navbar.php'; ?>
 
 
@@ -53,76 +68,87 @@
 </div>
 
 <!-- POPÜLER ÜRÜNLER -->
-<section id="populer" class="container py-5 mt-5" style="margin-top: 100px;">
+<section id="populer" class="container py-5 mt-5">
   <h2 class="mb-4" style="font-family: 'Playfair Display', serif; font-size: 1.5rem;">Popüler Ürünler</h2>
 
   <div class="d-flex overflow-auto gap-4 pb-3">
     <?php
-    include 'db_baglanti.php'; 
-    
     $sql = "SELECT * FROM urun WHERE kategori_id = 7";
     $result = $conn->query($sql);
 
-    if ($result->num_rows > 0) {
-        while ($row = $result->fetch_assoc()) {
-            echo '
-            <div class="col-6 col-md-4 col-lg-3 mb-4">
-              <div class="card product-card">
-                <img src="Resimler/' . $row['resim'] . '" class="img-fluid d-block w-100" alt="' . $row['urun_adi'] . '">
-                <div class="card-body product-card-body d-flex flex-column">
-                  <h5 class="card-title">' . $row['urun_adi'] . '</h5>
-                  <p class="card-text mb-auto">' . $row['fiyat'] . ' TL</p>
-                  <a href="#" class="btn float-end" style="background-color: #000; color: #fff;">Sepete Ekle</a>
-                </div>
-              </div>
-            </div>
-            ';
-        }
-    } else {
-        echo "<p>Popüler ürün bulunamadı.</p>";
-    }
+    if ($result->num_rows > 0):
+      while ($row = $result->fetch_assoc()):
+        $favoride_mi = in_array($row['urun_id'], $favoriler);
     ?>
+        <div class="col-6 col-md-4 col-lg-3 mb-4">
+          <div class="card product-card position-relative">
+            <a href="javascript:void(0);" 
+               onclick="toggleFavori(<?= $row['urun_id'] ?>, this)" 
+               class="position-absolute top-0 end-0 m-2" 
+               style="font-size: 1.5rem; color: black;">
+              <?php if ($favoride_mi): ?>
+                  <i class="bi bi-heart-fill"></i>
+              <?php else: ?>
+                  <i class="bi bi-heart"></i>
+              <?php endif; ?>
+            </a>
+            <img src="Resimler/<?= $row['resim'] ?>" class="img-fluid d-block w-100" alt="<?= htmlspecialchars($row['urun_adi']) ?>">
+            <div class="card-body product-card-body d-flex flex-column">
+              <h5 class="card-title"><?= htmlspecialchars($row['urun_adi']) ?></h5>
+              <p class="card-text mb-auto"><?= $row['fiyat'] ?> TL</p>
+              <a href="#" class="btn float-end" style="background-color: #000; color: #fff;">Sepete Ekle</a>
+            </div>
+          </div>
+        </div>
+    <?php endwhile; else: ?>
+      <p>Popüler ürün bulunamadı.</p>
+    <?php endif; ?>
   </div>
 </section>
 
 <!-- YENİ GELEN ÜRÜNLER -->
-
-<section id="yenigelen" class="container py-5 mt-0" style="margin-top: 100px;">
+<section id="yenigelen" class="container py-5 mt-0">
   <h2 class="mb-4" style="font-family: 'Playfair Display', serif; font-size: 1.5rem;">Yeni Gelen Ürünler</h2>
 
   <div class="d-flex overflow-auto gap-4 pb-3">
     <?php
-    include 'db_baglanti.php'; 
-
     $sql = "SELECT * FROM urun WHERE kategori_id = 8";
     $result = $conn->query($sql);
 
-    if ($result->num_rows > 0) {
-        while ($row = $result->fetch_assoc()) {
-            echo '
-            <div class="col-6 col-md-4 col-lg-3 mb-4">
-              <div class="card product-card">
-                <img src="Resimler/' . $row['resim'] . '" class="img-fluid d-block w-100" alt="' . $row['urun_adi'] . '">
-                <div class="card-body product-card-body d-flex flex-column">
-                  <h5 class="card-title">' . $row['urun_adi'] . '</h5>
-                  <p class="card-text mb-auto">' . $row['fiyat'] . ' TL</p>
-                  <a href="#" class="btn float-end" style="background-color: #000; color: #fff;">Sepete Ekle</a>
-                </div>
-              </div>
-            </div>
-            ';
-        }
-    } else {
-        echo "<p>Yeni gelen ürün bulunamadı.</p>";
-    }
+    if ($result->num_rows > 0):
+      while ($row = $result->fetch_assoc()):
+        $favoride_mi = in_array($row['urun_id'], $favoriler);
     ?>
+        <div class="col-6 col-md-4 col-lg-3 mb-4">
+          <div class="card product-card position-relative">
+            <a href="javascript:void(0);" 
+               onclick="toggleFavori(<?= $row['urun_id'] ?>, this)" 
+               class="position-absolute top-0 end-0 m-2" 
+               style="font-size: 1.5rem; color: black;">
+              <?php if ($favoride_mi): ?>
+                  <i class="bi bi-heart-fill"></i>
+              <?php else: ?>
+                  <i class="bi bi-heart"></i>
+              <?php endif; ?>
+            </a>
+            <img src="Resimler/<?= $row['resim'] ?>" class="img-fluid d-block w-100" alt="<?= htmlspecialchars($row['urun_adi']) ?>">
+            <div class="card-body product-card-body d-flex flex-column">
+              <h5 class="card-title"><?= htmlspecialchars($row['urun_adi']) ?></h5>
+              <p class="card-text mb-auto"><?= $row['fiyat'] ?> TL</p>
+              <a href="#" class="btn float-end" style="background-color: #000; color: #fff;">Sepete Ekle</a>
+            </div>
+          </div>
+        </div>
+    <?php endwhile; else: ?>
+      <p>Yeni gelen ürün bulunamadı.</p>
+    <?php endif; ?>
   </div>
 </section>
 
 
 <div class="container w-100 mt-3">
   <div class="card mx-auto">
-  <div class="row">
+    <div class="row">
 
       <div class="col-12 col-md-4">
         <div style="height: 100%; max-height: 320px; overflow: hidden;">
@@ -132,7 +158,7 @@
                style="object-fit: cover;">
         </div>
       </div>
-      
+
       <div class="col-12 col-md-8 p-4 text-center">
         <div class="card-body" style="padding: 1rem;">
           <strong class="card-title mt-3" style="font-family: 'Playfair Display', serif; font-size: 1.5rem;">
@@ -150,11 +176,32 @@
 
 <?php include 'footer.php'; ?>
 
+<!-- FAVORİ AJAX SCRIPT -->
+<script>
+function toggleFavori(urunId, element) {
+    fetch('favori_ekle.php?urun_id=' + urunId)
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === "not_logged_in") {
+                window.location.href = 'girisyap.php';
+                return;
+            }
+
+            let icon = element.querySelector('i');
+            if (data.status === "added") {
+                icon.classList.remove('bi-heart');
+                icon.classList.add('bi-heart-fill');
+            } else if (data.status === "removed") {
+                icon.classList.remove('bi-heart-fill');
+                icon.classList.add('bi-heart');
+            }
+        })
+        .catch(err => console.error('Favori ekleme hatası:', err));
+}
+</script>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
+
 </body>
+
 </html>
-
-
-
-
-

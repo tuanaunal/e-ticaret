@@ -15,20 +15,26 @@
 
 <body>
   <?php include 'navbar.php'; ?>
+
   <div class="d-flex justify-content-center align-items-center" style="min-height: 40vh;">
     <div class="card text-center shadow" style="width: 100%; max-width: 400px;">
       <div class="card-body">
         <h5 class="card-title mb-4">Giriş Yap</h5>
-        <form>
+
+        <?php if (isset($_GET['error'])): ?>
+          <div class="alert alert-danger"><?php echo htmlspecialchars($_GET['error']); ?></div>
+        <?php endif; ?>
+
+        <form method="POST" action="giris_islem.php">
           <div class="form-floating mb-3">
-            <input type="email" class="form-control" id="floatingInput" placeholder="name@example.com">
+            <input type="email" class="form-control" name="email" placeholder="name@example.com" required>
             <label for="floatingInput">E-posta Adresi</label>
           </div>
           <div class="form-floating mb-3">
-            <input type="password" class="form-control" id="floatingPassword" placeholder="Şifre">
+            <input type="password" class="form-control" name="sifre" placeholder="Şifre" required>
             <label for="floatingPassword">Şifre</label>
             <div id="passwordHelpBlock" class="form-text fs-smaller">
-              Şifreniz 8 karakterli ve karakterler arası boşluk olmamalı
+              Şifreniz 8 karakterli ve boşluk içermemeli
             </div>
           </div>
           <button type="submit" class="btn w-100" style="background-color: #000; color: #fff;">Giriş Yap</button>
@@ -36,6 +42,7 @@
       </div>
     </div>
   </div>
+
   <?php include 'footer.php'; ?>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
 </body>

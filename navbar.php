@@ -1,3 +1,10 @@
+<?php
+// Sadece session başlatılmamışsa başlat
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
+?>
+
 <nav>
   <ul class="nav justify-content-end">
     <ul class="navbar-nav ms-auto mb- mb-lg-0 m d-flex flex-row">
@@ -17,8 +24,15 @@
           <i class="bi bi-person" style="font-size: 1.5rem;"></i>
         </a>
         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-          <li><a class="dropdown-item" href="girisyap.php" style="font-family: 'Playfair Display', serif;">Giriş Yap</a></li>
-          <li><a class="dropdown-item" href="uyeol.php" style="font-family: 'Playfair Display', serif;">Üye Ol</a></li>
+          <?php if (isset($_SESSION['uye_id'])): ?>
+            <li class="dropdown-item" style="font-family: 'Playfair Display', serif;">
+              Merhaba, <?php echo $_SESSION['uye_ad']; ?>
+            </li>
+            <li><a class="dropdown-item" href="cikis.php" style="font-family: 'Playfair Display', serif;">Çıkış Yap</a></li>
+          <?php else: ?>
+            <li><a class="dropdown-item" href="girisyap.php" style="font-family: 'Playfair Display', serif;">Giriş Yap</a></li>
+            <li><a class="dropdown-item" href="uyeol.php" style="font-family: 'Playfair Display', serif;">Üye Ol</a></li>
+          <?php endif; ?>
         </ul>
       </li>
     </ul>
