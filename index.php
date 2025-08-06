@@ -5,7 +5,7 @@ include 'db_baglanti.php';
 $favoriler = [];
 if (isset($_SESSION['uye_id'])) {
     $uye_id = $_SESSION['uye_id'];
-    $fav_sql = "SELECT urun_id FROM favori WHERE uye_id = $uye_id";
+    $fav_sql = "SELECT urun_id FROM favoriler WHERE uye_id = $uye_id";
     $fav_result = $conn->query($fav_sql);
 
     while ($row = $fav_result->fetch_assoc()) {
@@ -37,29 +37,30 @@ if (isset($_SESSION['uye_id'])) {
 
 <div class="container my-4">
   <div id="carouselExample" class="carousel slide" data-bs-ride="carousel">
-<div id="carouselExampleAutoplaying" class="carousel slide" data-bs-ride="carousel">
-  <div class="carousel-inner">
-    <div class="carousel-item active">
-      <img src="YA-Dükkan Resimleri/index1.jpg" class="d-block w-100 style=height: 400px; object-fit: cover;" alt="Yakamoz Aksesuar">
+
+    <div class="carousel-inner">
+      <div class="carousel-item active">
+        <img src="YA-Dükkan Resimleri/index1.jpg" class="d-block w-100" alt="Yakamoz Aksesuar">
+      </div>
+      <div class="carousel-item">
+        <img src="YA-Dükkan Resimleri/index2.jpg" class="d-block w-100" alt="Yakamoz Aksesuar">
+      </div>
+      <div class="carousel-item">
+        <img src="YA-Dükkan Resimleri/index3.jpg" class="d-block w-100" alt="Yakamoz Aksesuar">
+      </div>
     </div>
-    <div class="carousel-item">
-      <img src="YA-Dükkan Resimleri/index2.jpg" class="d-block w-100 style=height: 400px; object-fit: cover;" alt="Yakamoz Aksesuar">
-    </div>
-    <div class="carousel-item">
-      <img src="YA-Dükkan Resimleri/index3.jpg" class="d-block w-100 style=height: 400px; object-fit: cover;" alt="Yakamoz Aksesuar">
-    </div>
+    <button class="carousel-control-prev" type="button" data-bs-target="#carouselExample" data-bs-slide="prev">
+      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Previous</span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#carouselExample" data-bs-slide="next">
+      <span class="carousel-control-next-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Next</span>
+    </button>
   </div>
-  <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleAutoplaying" data-bs-slide="prev">
-    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-    <span class="visually-hidden">Previous</span>
-  </button>
-  <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleAutoplaying" data-bs-slide="next">
-    <span class="carousel-control-next-icon" aria-hidden="true"></span>
-    <span class="visually-hidden">Next</span>
-  </button>
+
 </div>
-</div>
-</div>
+
 
 <div class="text-black py-1 mt-3" style="background-color: #000; color: #fff;">
   <marquee behavior="scroll" direction="left" scrollamount="5">
@@ -67,36 +68,38 @@ if (isset($_SESSION['uye_id'])) {
   </marquee>
 </div>
 
-<!-- POPÜLER ÜRÜNLER -->
+
 <section id="populer" class="container py-5 mt-5">
   <h2 class="mb-4" style="font-family: 'Playfair Display', serif; font-size: 1.5rem;">Popüler Ürünler</h2>
 
   <div class="d-flex overflow-auto gap-4 pb-3">
     <?php
-    $sql = "SELECT * FROM urun WHERE kategori_id = 7";
-    $result = $conn->query($sql);
-
-    if ($result->num_rows > 0):
-      while ($row = $result->fetch_assoc()):
+    $sql_populer = "SELECT * FROM urun WHERE populer = 1 LIMIT 10";
+    $result_populer = $conn->query($sql_populer);
+    
+    if ($result_populer && $result_populer->num_rows > 0):
+      while ($row = $result_populer->fetch_assoc()):
         $favoride_mi = in_array($row['urun_id'], $favoriler);
     ?>
         <div class="col-6 col-md-4 col-lg-3 mb-4">
           <div class="card product-card position-relative">
-            <a href="javascript:void(0);" 
-               onclick="toggleFavori(<?= $row['urun_id'] ?>, this)" 
-               class="position-absolute top-0 end-0 m-2" 
-               style="font-size: 1.5rem; color: black;">
-              <?php if ($favoride_mi): ?>
-                  <i class="bi bi-heart-fill"></i>
-              <?php else: ?>
-                  <i class="bi bi-heart"></i>
-              <?php endif; ?>
-            </a>
+            <button class="btn btn-link position-absolute top-0 end-0 m-2 favori-btn" 
+                    data-id="<?= $row['urun_id'] ?>" 
+                    style="font-size: 1.5rem; color: black;">
+                <i class="bi <?= $favoride_mi ? 'bi-suit-heart-fill' : 'bi-suit-heart'; ?>"></i>
+            </button>
+
             <img src="Resimler/<?= $row['resim'] ?>" class="img-fluid d-block w-100" alt="<?= htmlspecialchars($row['urun_adi']) ?>">
+
             <div class="card-body product-card-body d-flex flex-column">
               <h5 class="card-title"><?= htmlspecialchars($row['urun_adi']) ?></h5>
               <p class="card-text mb-auto"><?= $row['fiyat'] ?> TL</p>
-              <a href="#" class="btn float-end" style="background-color: #000; color: #fff;">Sepete Ekle</a>
+              <a href="#" 
+                 class="btn float-end sepete-ekle" 
+                 style="background-color: #000; color: #fff;" 
+                 data-id="<?= $row['urun_id'] ?>">
+                 Sepete Ekle
+              </a>
             </div>
           </div>
         </div>
@@ -106,36 +109,38 @@ if (isset($_SESSION['uye_id'])) {
   </div>
 </section>
 
-<!-- YENİ GELEN ÜRÜNLER -->
+
 <section id="yenigelen" class="container py-5 mt-0">
   <h2 class="mb-4" style="font-family: 'Playfair Display', serif; font-size: 1.5rem;">Yeni Gelen Ürünler</h2>
 
   <div class="d-flex overflow-auto gap-4 pb-3">
     <?php
-    $sql = "SELECT * FROM urun WHERE kategori_id = 8";
-    $result = $conn->query($sql);
-
-    if ($result->num_rows > 0):
-      while ($row = $result->fetch_assoc()):
+    $sql_yeni = "SELECT * FROM urun WHERE yeni_gelen = 1 LIMIT 10";
+    $result_yeni = $conn->query($sql_yeni);
+    
+    if ($result_yeni && $result_yeni->num_rows > 0):
+      while ($row = $result_yeni->fetch_assoc()):
         $favoride_mi = in_array($row['urun_id'], $favoriler);
     ?>
         <div class="col-6 col-md-4 col-lg-3 mb-4">
           <div class="card product-card position-relative">
-            <a href="javascript:void(0);" 
-               onclick="toggleFavori(<?= $row['urun_id'] ?>, this)" 
-               class="position-absolute top-0 end-0 m-2" 
-               style="font-size: 1.5rem; color: black;">
-              <?php if ($favoride_mi): ?>
-                  <i class="bi bi-heart-fill"></i>
-              <?php else: ?>
-                  <i class="bi bi-heart"></i>
-              <?php endif; ?>
-            </a>
+            <button class="btn btn-link position-absolute top-0 end-0 m-2 favori-btn" 
+                    data-id="<?= $row['urun_id'] ?>" 
+                    style="font-size: 1.5rem; color: black;">
+                <i class="bi <?= $favoride_mi ? 'bi-suit-heart-fill' : 'bi-suit-heart'; ?>"></i>
+            </button>
+
             <img src="Resimler/<?= $row['resim'] ?>" class="img-fluid d-block w-100" alt="<?= htmlspecialchars($row['urun_adi']) ?>">
+
             <div class="card-body product-card-body d-flex flex-column">
               <h5 class="card-title"><?= htmlspecialchars($row['urun_adi']) ?></h5>
               <p class="card-text mb-auto"><?= $row['fiyat'] ?> TL</p>
-              <a href="#" class="btn float-end" style="background-color: #000; color: #fff;">Sepete Ekle</a>
+              <a href="#" 
+                 class="btn float-end sepete-ekle" 
+                 style="background-color: #000; color: #fff;" 
+                 data-id="<?= $row['urun_id'] ?>">
+                 Sepete Ekle
+              </a>
             </div>
           </div>
         </div>
@@ -176,28 +181,63 @@ if (isset($_SESSION['uye_id'])) {
 
 <?php include 'footer.php'; ?>
 
-<!-- FAVORİ AJAX SCRIPT -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-function toggleFavori(urunId, element) {
-    fetch('favori_ekle.php?urun_id=' + urunId)
-        .then(response => response.json())
-        .then(data => {
-            if (data.status === "not_logged_in") {
-                window.location.href = 'girisyap.php';
+$(document).ready(function(){
+    $(".favori-btn").click(function(){
+        var urunId = $(this).data("id");
+        var btn = $(this);
+
+        $.ajax({
+            url: "favori_toggle.php",
+            type: "POST",
+            data: { urun_id: urunId },
+            success: function(response){
+                var data = JSON.parse(response);
+
+                if(data.status === "error" && data.redirect){
+                    window.location.href = data.redirect;
+                }
+
+                if(data.status === "success"){
+                    $("#favori-sayi").text(data.favori_sayi);
+
+                    if(data.action === "added"){
+                        btn.find("i").removeClass("bi-suit-heart").addClass("bi-suit-heart-fill");
+                    } else {
+                        btn.find("i").removeClass("bi-suit-heart-fill").addClass("bi-suit-heart");
+                    }
+                }
+            }
+        });
+    });
+
+    $(".sepete-ekle").click(function(e){
+        e.preventDefault(); 
+        var urunId = $(this).data("id");
+
+        $.ajax({
+            url: "sepet_ekle.php", 
+            type: "POST",
+            data: { urun_id: urunId },
+            success: function(response){
+                var data = JSON.parse(response);
+            if(data.status === "error" && data.redirect){
+                window.location.href = data.redirect;
                 return;
             }
 
-            let icon = element.querySelector('i');
-            if (data.status === "added") {
-                icon.classList.remove('bi-heart');
-                icon.classList.add('bi-heart-fill');
-            } else if (data.status === "removed") {
-                icon.classList.remove('bi-heart-fill');
-                icon.classList.add('bi-heart');
+                if(data.status === "success"){
+                    if($("#sepet-sayi").length){
+                        $("#sepet-sayi").text(data.toplam_adet);
+                    }
+                } else {
+                    alert(data.message);
+                }
             }
-        })
-        .catch(err => console.error('Favori ekleme hatası:', err));
-}
+        });
+    });
+});
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
