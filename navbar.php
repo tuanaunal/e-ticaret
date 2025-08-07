@@ -57,13 +57,17 @@ if (isset($_SESSION['uye_id'])) {
         </a>
         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
           <?php if (isset($_SESSION['uye_id'])): ?>
-            <li class="dropdown-item" style="font-family: 'Playfair Display', serif;">
+            <li class="dropdown-item fw-bold" style="font-family: 'Playfair Display', serif;">
               Merhaba, <?php echo $_SESSION['uye_ad']; ?>
             </li>
-            <li><a class="dropdown-item" href="cikis.php" style="font-family: 'Playfair Display', serif;">Çıkış Yap</a></li>
+            <li><a class="dropdown-item" style="font-family: 'Playfair Display', serif;" href="hesabim.php">Hesabım</a></li>
+            <li><a class="dropdown-item" style="font-family: 'Playfair Display', serif;" href="siparislerim.php">Siparişlerim</a></li>
+            <li><a class="dropdown-item" style="font-family: 'Playfair Display', serif;" href="sifre_degistir.php">Şifre Değiştir</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" style="font-family: 'Playfair Display', serif;" href="cikis.php">Çıkış Yap</a></li>
           <?php else: ?>
-            <li><a class="dropdown-item" href="girisyap.php" style="font-family: 'Playfair Display', serif;">Giriş Yap</a></li>
-            <li><a class="dropdown-item" href="uyeol.php" style="font-family: 'Playfair Display', serif;">Üye Ol</a></li>
+            <li><a class="dropdown-item" style="font-family: 'Playfair Display', serif;" href="girisyap.php">Giriş Yap</a></li>
+            <li><a class="dropdown-item" style="font-family: 'Playfair Display', serif;" href="uyeol.php">Üye Ol</a></li>
           <?php endif; ?>
         </ul>
       </li>
@@ -85,10 +89,9 @@ if (isset($_SESSION['uye_id'])) {
           </li>
         </ul>
         <form class="d-flex" role="search" action="arama.php" method="GET">
-  <input class="form-control me-2" type="search" name="q" placeholder="Ürün veya kategori ara" aria-label="Ürün veya kategori ara" />
-  <button class="btn btn-outline-light" type="submit"><i class="bi bi-search"></i></button>
-</form>
-
+          <input class="form-control me-2" type="search" name="q" placeholder="Ürün veya kategori ara" aria-label="Ürün veya kategori ara" />
+          <button class="btn btn-outline-light" type="submit"><i class="bi bi-search"></i></button>
+        </form>
       </div>
     </div>
   </nav>
@@ -117,5 +120,5 @@ if (isset($_SESSION['uye_id'])) {
       </ul>
     </div>
   </nav>
-  
+
 </nav>

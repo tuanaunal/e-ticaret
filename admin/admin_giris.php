@@ -1,14 +1,16 @@
 <?php
 session_start();
-include '../db_baglanti.php'; 
+include '../db_baglanti.php';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $email = $_POST['email'];
     $sifre = $_POST['sifre'];
 
-   
-    $sql = "SELECT * FROM admin WHERE email = '$email' AND sifre = '$sifre'";
-    $result = $conn->query($sql);
+    // Güvenli sorgu (SQL injection'a karşı)
+    $stmt = $conn->prepare("SELECT * FROM admin WHERE email = ? AND sifre = ?");
+    $stmt->bind_param("ss", $email, $sifre);
+    $stmt->execute();
+    $result = $stmt->get_result();
 
     if ($result->num_rows > 0) {
         $_SESSION['admin'] = $email;
@@ -22,14 +24,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-    <meta charset="UTF-8">
-    <title>Admin Girişi</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="keywords" content="Aksesuar,Takı,Gözlük,Şapka,Çanta,Toka,Saç Aksesuarı">
+  <meta name="description" content="Yakamoz Aksesuar’da zarif takılar, gözlükler, şapkalar, çantalar ve saç aksesuarlarıyla tarzına ışıltı kat. Hızlı kargo, güvenli ödeme ve uygun fiyat seni bekliyor!">
+  <link rel="icon" type="image/png" href="YA-Dükkan Resimleri/icon.png">
+  <title>Admin Girişi - Yakamoz Aksesuar</title>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+
 </head>
 <body class="d-flex justify-content-center align-items-center vh-100 bg-light">
     <div class="card p-4 shadow" style="width: 400px;">
         <h3 class="text-center mb-3">Admin Girişi</h3>
-        <?php if(isset($hata)) echo "<div class='alert alert-danger'>$hata</div>"; ?>
+        <?php if (isset($hata)) echo "<div class='alert alert-danger'>$hata</div>"; ?>
         <form method="POST">
             <div class="mb-3">
                 <label class="form-label">E-posta</label>
@@ -44,4 +53,3 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     </div>
 </body>
 </html>
-

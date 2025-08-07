@@ -73,14 +73,13 @@ if ($result && $result->num_rows > 0) {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 2rem;
+  gap: 1.5rem;
   margin-top: 4rem;
   margin-bottom: 4rem;
   flex-wrap: wrap;
 }
+</style>
 
-
-  </style>
 </head>
 <body>
 
@@ -92,46 +91,45 @@ if ($result && $result->num_rows > 0) {
 </h2>
 
 
-  <div id="sepet-listesi" class="row gx-3 gy-4 justify-content-center my-4">
-    <?php if (!empty($items)): ?>
-      <?php foreach ($items as $urun): ?>
-        <div class="col-6 col-md-4 col-lg-3 mb-4 product-card-container">
-          <div class="card product-card position-relative">
+<div id="sepet-listesi" class="row gx-3 gy-4 justify-content-center my-4">
+  <?php if (!empty($items)): ?>
+    <?php foreach ($items as $urun): ?>
+      <div class="col-6 col-md-4 col-lg-3 mb-4 product-card-container">
+        <div class="card product-card position-relative">
+          <img src="resimler/<?= $urun['resim'] ?>" 
+               class="img-fluid d-block w-100" 
+               alt="<?= htmlspecialchars($urun['urun_adi']) ?>">
 
-            <img src="resimler/<?= $urun['resim'] ?>" 
-                 class="img-fluid d-block w-100" 
-                 alt="<?= htmlspecialchars($urun['urun_adi']) ?>">
+          <div class="card-body product-card-body">
+            <h5 class="card-title"><?= htmlspecialchars($urun['urun_adi']) ?></h5>
+            <p class="card-text mb-auto"><?= $urun['fiyat'] ?> TL</p>
+            <p class="card-text">Adet: <strong id="adet-<?= $urun['urun_id'] ?>"><?= $urun['adet'] ?></strong></p>
 
-            <div class="card-body product-card-body">
-              <h5 class="card-title"><?= htmlspecialchars($urun['urun_adi']) ?></h5>
-              <p class="card-text mb-auto"><?= $urun['fiyat'] ?> TL</p>
-              <p class="card-text">Adet: <strong id="adet-<?= $urun['urun_id'] ?>"><?= $urun['adet'] ?></strong></p>
-
-              <div class="quantity-controls">
-                <button class="btn btn-sm btn-dark sepet-arttir" data-id="<?= $urun['urun_id'] ?>">+</button>
-                <button class="btn btn-sm btn-outline-dark sepet-azalt" data-id="<?= $urun['urun_id'] ?>">-</button>
-              </div>
+            <div class="quantity-controls">
+              <button class="btn btn-sm btn-dark sepet-arttir" data-id="<?= $urun['urun_id'] ?>">+</button>
+              <button class="btn btn-sm btn-outline-dark sepet-azalt" data-id="<?= $urun['urun_id'] ?>">-</button>
             </div>
           </div>
         </div>
-      <?php endforeach; ?>
-
-      <div class="total-checkout">
-        <h4>Toplam: <?= $total_price ?> TL</h4>
-        <a href="odeme.php" class="btn btn-dark btn-lg">Sepeti Onayla</a>
       </div>
+    <?php endforeach; ?>
 
-    <?php else: ?>
-  <div class="d-flex flex-column justify-content-center align-items-center text-center" 
-       style="flex: 1; min-height: 60vh; margin-top: 1rem;"> 
-    <p style="font-size: 1.2rem;">
-      Sepetiniz boş. <br> Hadi ürünlere bakalım! 🛍️
-    </p>
-    <a href="index.php" class="btn btn-dark mt-3">Alışverişe Başla</a>
-  </div>
-<?php endif; ?>
+    <div class="total-checkout">
+      <h4>Toplam: <?= $total_price ?> TL</h4>
+      <a href="siparis_form.php" class="btn btn-dark btn-lg">Sepeti Onayla</a>
+      <a href="sepet_temizle.php" class="btn btn-outline-dark btn-lg">Sepeti Temizle</a>
+    </div>
 
-  </div>
+  <?php else: ?>
+    <div class="d-flex flex-column justify-content-center align-items-center text-center" 
+         style="flex: 1; min-height: 60vh; margin-top: 1rem;"> 
+      <p style="font-size: 1.2rem;">
+        Sepetiniz boş. <br> Hadi ürünlere bakalım! 🛍️
+      </p>
+      <a href="index.php" class="btn btn-dark mt-3">Alışverişe Başla</a>
+    </div>
+  <?php endif; ?>
+</div>
 </main>
 
 <?php include 'footer.php'; ?>
@@ -203,7 +201,6 @@ $(document).ready(function(){
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
-
 
 </body>
 </html>
