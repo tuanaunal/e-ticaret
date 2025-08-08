@@ -115,10 +115,15 @@ if ($result && $result->num_rows > 0) {
     <?php endforeach; ?>
 
     <div class="total-checkout">
-      <h4>Toplam: <?= $total_price ?> TL</h4>
+  <div class="card shadow-sm px-5 py-4" style="border: 3px solid black; border-radius: 10px;">
+    <div class="d-flex flex-row align-items-center justify-content-center flex-wrap gap-4">
+      <h4 class="m-0">Toplam: <?= $total_price ?> TL</h4>
       <a href="siparis_form.php" class="btn btn-dark btn-lg">Sepeti Onayla</a>
-      <a href="sepet_temizle.php" class="btn btn-outline-dark btn-lg">Sepeti Temizle</a>
+      <a href="sepet_temizle.php" class="btn btn-dark btn-lg">Sepeti Temizle</a>
     </div>
+  </div>
+</div>
+
 
   <?php else: ?>
     <div class="d-flex flex-column justify-content-center align-items-center text-center" 

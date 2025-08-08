@@ -89,16 +89,24 @@ while ($row = $fav_result->fetch_assoc()) {
           </div>
         </div>
       <?php endwhile; ?>
-    <?php else: ?>
-      <div class="text-center d-flex flex-column justify-content-center align-items-center" 
-     style="height: 60vh;"> 
-  <p style="font-size: 1.2rem;">
-    Favorilediğiniz ürün bulunmamaktadır. <br> Hadi ürünlere bakalım! 🛍️
-  </p>
-  <a href="index.php" class="btn btn-dark mt-3">Alışverişe Başla</a>
-</div>
+      <?php if ($result && $result->num_rows > 0): ?>
+  <div class="d-flex justify-content-center my-4">
+    <a href="favoriler_temizle.php"
+       class="btn btn-dark btn-lg">
+       Favorileri Temizle
+    </a>
+  </div>
+<?php endif; ?>
 
-    <?php endif; ?>
+<?php else: ?>
+  <div class="text-center my-5">
+    <p style="font-size: 1.2rem;">
+      Favorilediğiniz ürün bulunmamaktadır. <br> Hadi ürünlere bakalım! 🛍️
+    </p>
+    <a href="index.php" class="btn btn-dark mt-3">Alışverişe Başla</a>
+  </div>
+<?php endif; ?>
+
   </div>
 </main>
 

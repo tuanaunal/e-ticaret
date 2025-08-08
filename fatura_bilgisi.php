@@ -12,8 +12,8 @@ if (!isset($_GET["siparis_id"])) {
     exit();
 }
 
-$uye_id = $_SESSION["uye_id"];
-$siparis_id = intval($_GET["siparis_id"]);
+$uye_id     = (int)$_SESSION["uye_id"];
+$siparis_id = (int)$_GET["siparis_id"];
 
 $sorgu = $conn->prepare("SELECT * FROM siparis WHERE siparis_id = ? AND uye_id = ?");
 $sorgu->bind_param("ii", $siparis_id, $uye_id);
@@ -35,10 +35,28 @@ $urun_sorgu->bind_param("i", $siparis_id);
 $urun_sorgu->execute();
 $urunler = $urun_sorgu->get_result()->fetch_all(MYSQLI_ASSOC);
 
-$bilgi_sorgu = $conn->prepare("SELECT * FROM siparis_bilgi WHERE siparis_id = ?");
-$bilgi_sorgu->bind_param("i", $siparis_id);
+$bilgi_sorgu = $conn->prepare("
+    SELECT 
+        a.ad_soyad,
+        a.telefon,
+        a.acik_adres AS adres,
+        a.ilce,
+        a.il,
+        o.ad AS odeme_yontemi
+    FROM siparis s
+    LEFT JOIN adres a ON s.adres_id = a.adres_id
+    LEFT JOIN odeme_yontemi o ON s.odeme_yontemi_id = o.odeme_yontemi_id
+    WHERE s.siparis_id = ? AND s.uye_id = ?
+");
+$bilgi_sorgu->bind_param("ii", $siparis_id, $uye_id);
 $bilgi_sorgu->execute();
 $bilgi = $bilgi_sorgu->get_result()->fetch_assoc();
+
+$durum_raw  = $siparis["durum"] ?? "";
+$durum      = trim($durum_raw);
+$is_kargoda = (mb_strtolower($durum,'UTF-8') === mb_strtolower('Kargoya Verildi','UTF-8'));
+
+$siparis_no = trim($siparis["siparis_no"] ?? "");
 ?>
 
 <!DOCTYPE html>
@@ -63,13 +81,20 @@ $bilgi = $bilgi_sorgu->get_result()->fetch_assoc();
   <div class="card shadow p-4">
     <h2 class="mb-4 text-center" style="font-family: 'Playfair Display', serif;">Fatura Bilgisi</h2>
 
-    <div class="mb-4">
-      <p class="mb-2"><strong>Sipariş Tarihi:</strong> <?= $siparis["siparis_tarihi"] ?></p>
-      <p class="mb-2"><strong>Sipariş Durumu:</strong> <?= $siparis["durum"] ?></p>
-      <p class="mb-2"><strong>Kargo Firması:</strong> <?= $siparis["kargo_firma"] ?? "Bilgi yok" ?></p>
-      <p class="mb-2"><strong>Kargo Takip No:</strong> <?= $siparis["kargo_takip_no"] ?? "Bilgi yok" ?></p>
-      <p class="mb-0"><strong>Toplam Tutar:</strong> <?= $siparis["toplam_tutar"] ?> TL</p>
-    </div>
+    <div class="mb-3">
+  <p class="mb-2"><strong>Sipariş No:</strong> <?= htmlspecialchars($siparis_no ?: '#'.$siparis_id) ?></p>
+  <p class="mb-2"><strong>Sipariş Tarihi:</strong> <?= htmlspecialchars($siparis["siparis_tarihi"]) ?></p>
+  <p class="mb-2"><strong>Sipariş Durumu:</strong> <?= htmlspecialchars($durum) ?></p>
+  <p class="mb-2"><strong>Kargo Firması:</strong> <?= htmlspecialchars($siparis["kargo_firma"] ?? "Bilgi yok") ?></p>
+  <p class="mb-0"><strong>Toplam Tutar:</strong> <?= htmlspecialchars($siparis["toplam_tutar"]) ?> TL</p>
+
+  <?php if ($is_kargoda): ?>
+    <a class="btn btn-dark btn-sm mt-3" target="_blank" rel="noopener" href="https://www.yurticikargo.com/">
+      Kargo Takibi
+    </a>
+  <?php endif; ?>
+</div>
+
 
     <hr>
 
@@ -82,20 +107,20 @@ $bilgi = $bilgi_sorgu->get_result()->fetch_assoc();
                  class="card-img-top img-fluid" 
                  alt="<?= htmlspecialchars($urun['urun_adi']) ?>" 
                  style="height: 200px; object-fit: cover;">
-
+                 
             <div class="card-body p-2 d-flex flex-column justify-content-between">
               <div>
                 <h6 class="card-title fw-semibold mb-2" style="font-size: 1rem;">
                   <?= htmlspecialchars($urun["urun_adi"]) ?>
                 </h6>
                 <p class="card-text mb-1" style="font-size: 0.9rem;">
-                  <strong>Adet:</strong> <span class="fw-normal"><?= $urun["adet"] ?></span>
+                  <strong>Adet:</strong> <span class="fw-normal"><?= (int)$urun["adet"] ?></span>
                 </p>
                 <p class="card-text mb-1" style="font-size: 0.9rem;">
-                  <strong>Birim Fiyat:</strong> <span class="fw-normal"><?= $urun["birim_fiyat"] ?> TL</span>
+                  <strong>Birim Fiyat:</strong> <span class="fw-normal"><?= htmlspecialchars($urun["birim_fiyat"]) ?> TL</span>
                 </p>
                 <p class="card-text mb-0" style="font-size: 0.9rem;">
-                  <strong>Ara Toplam:</strong> <span class="fw-normal"><?= $urun["birim_fiyat"] * $urun["adet"] ?> TL</span>
+                  <strong>Ara Toplam:</strong> <span class="fw-normal"><?= number_format($urun["birim_fiyat"] * $urun["adet"], 2) ?> TL</span>
                 </p>
               </div>
             </div>
@@ -108,10 +133,14 @@ $bilgi = $bilgi_sorgu->get_result()->fetch_assoc();
 
     <h5 class="mt-4 mb-3">Teslimat Bilgisi:</h5>
     <div class="mb-3">
-      <p class="mb-2"><strong>Ad Soyad:</strong> <?= $bilgi["ad_soyad"] ?></p>
-      <p class="mb-2"><strong>Telefon:</strong> <?= $bilgi["telefon"] ?></p>
-      <p class="mb-2"><strong>Adres:</strong> <?= $bilgi["adres"] ?> - <?= $bilgi["ilce"] ?>/<?= $bilgi["sehir"] ?></p>
-      <p class="mb-0"><strong>Ödeme Yöntemi:</strong> <?= $bilgi["odeme_yontemi"] ?></p>
+      <p class="mb-2"><strong>Ad Soyad:</strong> <?= htmlspecialchars($bilgi["ad_soyad"] ?? "Bilgi yok") ?></p>
+      <p class="mb-2"><strong>Telefon:</strong> <?= htmlspecialchars($bilgi["telefon"] ?? "Bilgi yok") ?></p>
+      <p class="mb-2">
+        <strong>Adres:</strong>
+        <?= htmlspecialchars($bilgi["adres"] ?? "Bilgi yok") ?> -
+        <?= htmlspecialchars($bilgi["ilce"] ?? "") ?>/<?= htmlspecialchars($bilgi["il"] ?? "") ?>
+      </p>
+      <p class="mb-0"><strong>Ödeme Yöntemi:</strong> <?= htmlspecialchars($bilgi["odeme_yontemi"] ?? "Bilgi yok") ?></p>
     </div>
 
     <div class="text-center mt-4">

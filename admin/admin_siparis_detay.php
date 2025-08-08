@@ -17,7 +17,7 @@ $sorgu->bind_param("i", $siparis_id);
 $sorgu->execute();
 $siparis = $sorgu->get_result()->fetch_assoc();
 
-$urun_sorgu = $conn->prepare("SELECT sd.*, u.urun_adi 
+$urun_sorgu = $conn->prepare("SELECT sd.*, u.urun_adi, u.resim 
                               FROM siparis_detay sd 
                               JOIN urun u ON sd.urun_id = u.urun_id 
                               WHERE sd.siparis_id = ?");
@@ -43,66 +43,99 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     exit();
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="tr">
 <head>
 <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="keywords" content="Aksesuar,Takı,Gözlük,Şapka,Çanta,Toka,Saç Aksesuarı">
-  <meta name="description" content="Yakamoz Aksesuar’da zarif takılar, gözlükler, şapkalar, çantalar ve saç aksesuarlarıyla tarzına ışıltı kat. Hızlı kargo, güvenli ödeme ve uygun fiyat seni bekliyor!">
-  <link rel="icon" type="image/png" href="YA-Dükkan Resimleri/icon.png">
+  <meta name="description" content="Yakamoz Aksesuar – Admin Girişi">
+  <link rel="icon" type="image/png" href="../YA-Dükkan Resimleri/icon.png">
   <title>Admin Sipariş Detayı - Yakamoz Aksesuar</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="../style.css">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
-
+<style>
+    body { background-color: #f8f9fa; }
+    .panel-card {
+        max-width: 900px;
+        width: 100%;
+        border-radius: 1rem;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+    }
+    .product-card img {
+        height: 150px;
+        object-fit: cover;
+        border-radius: .5rem;
+    }
+</style>
 </head>
-<body class="container mt-5">
-    <h2 class="mb-4">Sipariş #<?= $siparis_id ?> Detayları</h2>
+<body>
 
-    <div class="mb-4">
-        <strong>Müşteri:</strong> <?= $siparis["musteri_ad"] ?> (<?= $siparis["email"] ?>)<br>
-        <strong>Tarih:</strong> <?= $siparis["siparis_tarihi"] ?><br>
-        <strong>Toplam Tutar:</strong> <?= $siparis["toplam_tutar"] ?> TL
+<div class="container d-flex justify-content-center align-items-center py-5">
+    <div class="card panel-card p-4">
+        <h2 class="mb-4 text-center">📦 Sipariş #<?= $siparis_id ?> Detayları</h2>
+
+        <div class="mb-4">
+            <p><strong>Müşteri:</strong> <?= htmlspecialchars($siparis["musteri_ad"]) ?> (<?= htmlspecialchars($siparis["email"]) ?>)</p>
+            <p><strong>Tarih:</strong> <?= $siparis["siparis_tarihi"] ?></p>
+            <p><strong>Toplam Tutar:</strong> <?= $siparis["toplam_tutar"] ?> TL</p>
+        </div>
+
+        <hr>
+
+        <h5 class="mb-3">Ürünler</h5>
+        <div class="row g-3 mb-4">
+            <?php while ($u = $urunler->fetch_assoc()): ?>
+                <div class="col-12 col-sm-6 col-md-4">
+                    <div class="card product-card h-100 p-2 shadow-sm">
+                        <img src="Resimler/<?= htmlspecialchars($u["resim"]) ?>" class="img-fluid" alt="<?= htmlspecialchars($u["urun_adi"]) ?>">
+                        <div class="mt-2">
+                            <h6><?= htmlspecialchars($u["urun_adi"]) ?></h6>
+                            <small>Adet: <?= $u["adet"] ?> | <?= $u["birim_fiyat"] ?> TL</small>
+                        </div>
+                    </div>
+                </div>
+            <?php endwhile; ?>
+        </div>
+
+        <hr>
+
+        <h5 class="mb-3">Teslimat & Ödeme Bilgisi</h5>
+        <div class="bg-light p-3 rounded mb-4">
+            <p><strong>Ad Soyad:</strong> <?= htmlspecialchars($bilgi["ad_soyad"]) ?></p>
+            <p><strong>Telefon:</strong> <?= htmlspecialchars($bilgi["telefon"]) ?></p>
+            <p><strong>Adres:</strong> <?= htmlspecialchars($bilgi["adres"]) ?> - <?= htmlspecialchars($bilgi["ilce"]) ?>/<?= htmlspecialchars($bilgi["sehir"]) ?></p>
+            <p><strong>Ödeme:</strong> <?= htmlspecialchars($bilgi["odeme_yontemi"]) ?></p>
+        </div>
+
+        <h5 class="mb-3">⚙️ Sipariş Durumu ve Kargo</h5>
+        <form method="POST" class="mb-3">
+            <div class="mb-3">
+                <label class="form-label">Sipariş Durumu</label>
+                <select name="durum" class="form-select">
+                    <option value="Hazırlanıyor" <?= $siparis["durum"] == "Hazırlanıyor" ? "selected" : "" ?>>Hazırlanıyor</option>
+                    <option value="Kargoya Verildi" <?= $siparis["durum"] == "Kargoya Verildi" ? "selected" : "" ?>>Kargoya Verildi</option>
+                    <option value="Teslim Edildi" <?= $siparis["durum"] == "Teslim Edildi" ? "selected" : "" ?>>Teslim Edildi</option>
+                    <option value="İptal Edildi" <?= $siparis["durum"] == "İptal Edildi" ? "selected" : "" ?>>İptal Edildi</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Kargo Firması</label>
+                <input type="text" name="kargo_firma" class="form-control" value="<?= htmlspecialchars($siparis["kargo_firma"]) ?>">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Kargo Takip No</label>
+                <input type="text" name="kargo_takip_no" class="form-control" value="<?= htmlspecialchars($siparis["kargo_takip_no"]) ?>">
+            </div>
+            <div class="text-center">
+                <button type="submit" class="btn btn-success px-4">Kaydet</button>
+                <a href="admin_siparisler.php" class="btn btn-secondary px-4">Geri Dön</a>
+            </div>
+        </form>
     </div>
+</div>
 
-    <h5>Ürünler:</h5>
-    <ul>
-        <?php while ($u = $urunler->fetch_assoc()): ?>
-            <li><?= $u["urun_adi"] ?> - <?= $u["adet"] ?> adet - <?= $u["birim_fiyat"] ?> TL</li>
-        <?php endwhile; ?>
-    </ul>
-
-    <h5 class="mt-4">Teslimat ve Ödeme Bilgisi:</h5>
-    <p>
-        <strong>Ad Soyad:</strong> <?= $bilgi["ad_soyad"] ?><br>
-        <strong>Telefon:</strong> <?= $bilgi["telefon"] ?><br>
-        <strong>Adres:</strong> <?= $bilgi["adres"] ?> - <?= $bilgi["ilce"] ?>/<?= $bilgi["sehir"] ?><br>
-        <strong>Ödeme:</strong> <?= $bilgi["odeme_yontemi"] ?>
-    </p>
-
-    <h5 class="mt-4">⚙️ Sipariş Durumu ve Kargo Bilgileri:</h5>
-    <form method="POST">
-        <div class="mb-3">
-            <label class="form-label">Sipariş Durumu</label>
-            <select name="durum" class="form-select">
-                <option value="Hazırlanıyor" <?= $siparis["durum"] == "Hazırlanıyor" ? "selected" : "" ?>>Hazırlanıyor</option>
-                <option value="Kargoya Verildi" <?= $siparis["durum"] == "Kargoya Verildi" ? "selected" : "" ?>>Kargoya Verildi</option>
-                <option value="Teslim Edildi" <?= $siparis["durum"] == "Teslim Edildi" ? "selected" : "" ?>>Teslim Edildi</option>
-                <option value="İptal Edildi" <?= $siparis["durum"] == "İptal Edildi" ? "selected" : "" ?>>İptal Edildi</option>
-            </select>
-        </div>
-        <div class="mb-3">
-            <label class="form-label">Kargo Firması</label>
-            <input type="text" name="kargo_firma" class="form-control" value="<?= $siparis["kargo_firma"] ?>">
-        </div>
-        <div class="mb-3">
-            <label class="form-label">Kargo Takip No</label>
-            <input type="text" name="kargo_takip_no" class="form-control" value="<?= $siparis["kargo_takip_no"] ?>">
-        </div>
-        <button type="submit" class="btn btn-success">Kaydet</button>
-        <a href="admin_siparisler.php" class="btn btn-secondary">Geri Dön</a>
-    </form>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
