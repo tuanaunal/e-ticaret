@@ -35,18 +35,8 @@ while ($row = $fav_result->fetch_assoc()) {
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
 
   <style>
-    body {
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh;
-    }
-
-    main {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      min-height: calc(100vh - 150px); 
-    }
+    body { display:flex; flex-direction:column; min-height:100vh; }
+    main { flex:1; display:flex; flex-direction:column; min-height:calc(100vh - 150px); }
   </style>
 </head>
 <body>
@@ -89,79 +79,155 @@ while ($row = $fav_result->fetch_assoc()) {
           </div>
         </div>
       <?php endwhile; ?>
-      <?php if ($result && $result->num_rows > 0): ?>
-  <div class="d-flex justify-content-center my-4">
-    <a href="favoriler_temizle.php"
-       class="btn btn-dark btn-lg">
-       Favorileri Temizle
-    </a>
-  </div>
-<?php endif; ?>
 
-<?php else: ?>
-  <div class="text-center my-5">
-    <p style="font-size: 1.2rem;">
-      Favorilediğiniz ürün bulunmamaktadır. <br> Hadi ürünlere bakalım! 🛍️
-    </p>
-    <a href="index.php" class="btn btn-dark mt-3">Alışverişe Başla</a>
-  </div>
-<?php endif; ?>
+      <div class="d-flex justify-content-center my-4">
+        <a href="favoriler_temizle.php" class="btn btn-dark btn-lg">Favorileri Temizle</a>
+      </div>
+
+    <?php else: ?>
+      <div class="text-center my-5">
+        <p style="font-size: 1.2rem;">
+          Favorilediğiniz ürün bulunmamaktadır. <br> Hadi ürünlere bakalım! 🛍️
+        </p>
+        <a href="index.php" class="btn btn-dark mt-3">Alışverişe Başla</a>
+      </div>
+    <?php endif; ?>
 
   </div>
 </main>
 
 <?php include 'footer.php'; ?>
 
-
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-$(document).ready(function(){
-    $(".favori-btn").click(function(){
-        var urunId = $(this).data("id");
-        var btn = $(this);
+$(function(){
 
-        $.ajax({
-            url: "favori_toggle.php",
-            type: "POST",
-            data: { urun_id: urunId },
-            success: function(response){
-                var data = JSON.parse(response);
+  $(".favori-btn").on("click", function(e){
+      e.preventDefault();
+      var urunId = $(this).data("id");
+      var btn = $(this);
 
-                if(data.status === "error" && data.redirect){
-                    window.location.href = data.redirect;
-                    return;
-                }
+      $.ajax({
+          url: "favori_toggle.php",
+          type: "POST",
+          data: { urun_id: urunId },
+          success: function(response){
+              var data;
+              try { data = (typeof response === 'object') ? response : JSON.parse(response); }
+              catch(e){
+                if (typeof bildirimGoster === 'function') bildirimGoster('Beklenmedik cevap!', 'danger', 4000);
+                return;
+              }
 
-                if(data.status === "success"){
-                    $("#favori-sayi").text(data.favori_sayi);
+              if (data.status === "error" && data.redirect){
+                  window.location.href = data.redirect;
+                  return;
+              }
 
-                    if(data.action === "added"){
-                        btn.find("i").removeClass("bi-suit-heart").addClass("bi-suit-heart-fill");
-                    } else {
-                        btn.find("i").removeClass("bi-suit-heart-fill").addClass("bi-suit-heart");
+              if (data.status === "success"){
+                  if ($("#favori-sayi").length && typeof data.favori_sayi !== "undefined"){
+                      $("#favori-sayi").text(data.favori_sayi);
+                  }
 
-                        if (window.location.pathname.includes('favoriler.php')) {
-                            btn.closest('.product-card-container').remove();
+                  if (data.action === "added"){
+                      btn.find("i").removeClass("bi-suit-heart").addClass("bi-suit-heart-fill");
+                      if (typeof bildirimGoster === 'function') bildirimGoster("Favorilere eklendi ❤️", "success");
+                  } else {
+                      btn.find("i").removeClass("bi-suit-heart-fill").addClass("bi-suit-heart");
+                      if (typeof bildirimGoster === 'function') bildirimGoster("Favorilerden kaldırıldı", "secondary");
 
-                            if ($(".product-card-container").length === 0) {
-                                $("#favori-listesi").html(`
-                                  <div class="text-center my-5">
-                                    <p style="font-size: 1.2rem;">Favorilediğiniz ürün bulunmamaktadır. <br> Hadi ürünlere bakalım! 🛍️</p>
-                                    <a href="index.php" class="btn btn-dark mt-3">Alışverişe Başla</a>
-                                  </div>
-                                `);
-                            }
-                        }
-                    }
-                }
+                      btn.closest('.product-card-container').remove();
+                      if ($(".product-card-container").length === 0) {
+                          $("#favori-listesi").html(`
+                            <div class="text-center my-5">
+                              <p style="font-size: 1.2rem;">Favorilediğiniz ürün bulunmamaktadır. <br> Hadi ürünlere bakalım! 🛍️</p>
+                              <a href="index.php" class="btn btn-dark mt-3">Alışverişe Başla</a>
+                            </div>
+                          `);
+                      }
+                  }
+              } else {
+                  var hata = data.message || data.mesaj || "Bir şey ters gitti.";
+                  if (typeof bildirimGoster === 'function') bildirimGoster(hata, 'danger', 4000);
+              }
+          },
+          error: function(){
+              if (typeof bildirimGoster === 'function') bildirimGoster('Ağ hatası!', 'danger', 4000);
+          }
+      });
+  });
+
+  $(".sepete-ekle").on("click", function(e){
+      e.preventDefault();
+      var urunId = $(this).data("id");
+
+      $.ajax({
+        url: "sepet_ekle.php",
+        type: "POST",
+        data: { urun_id: urunId },
+        success: function(response){
+          var data;
+          try { data = (typeof response === 'object') ? response : JSON.parse(response); }
+          catch(e){
+            if (typeof bildirimGoster === 'function') bildirimGoster('Beklenmedik cevap!', 'danger', 4000);
+            return;
+          }
+
+          if (data.status === "error" && data.redirect){
+            window.location.href = data.redirect;
+            return;
+          }
+
+          if (data.status === "success"){
+            if ($("#sepet-sayi").length && typeof data.toplam_adet !== "undefined"){
+              $("#sepet-sayi").text(data.toplam_adet);
             }
-        });
-    });
+            if (typeof bildirimGoster === 'function') bildirimGoster('Sepete eklendi ✅', 'primary');
+          } else {
+            var msg = data.message || data.mesaj || "Sepete ekleme başarısız.";
+            if (typeof bildirimGoster === 'function') bildirimGoster(msg, 'danger', 4000);
+          }
+        },
+        error: function(){
+          if (typeof bildirimGoster === 'function') bildirimGoster('Ağ hatası!', 'danger', 4000);
+        }
+      });
+  });
+
+  $(document).on('click','a[href="favoriler_temizle.php"]', function(e){
+      e.preventDefault();
+      var href = this.href;
+
+      $.ajax({
+        url: 'favoriler_temizle.php',
+        type: 'POST',
+        dataType: 'json',
+        success: function(res){
+          if (res && (res.status === 'success' || res.ok === true || res.ok === 'true')) {
+            if (typeof bildirimGoster === 'function') bildirimGoster('Favoriler temizlendi', 'secondary');
+            $("#favori-listesi").html(`
+              <div class="text-center my-5">
+                <p style="font-size: 1.2rem;">Favorilediğiniz ürün bulunmamaktadır. <br> Hadi ürünlere bakalım! 🛍️</p>
+                <a href="index.php" class="btn btn-dark mt-3">Alışverişe Başla</a>
+              </div>
+            `);
+            if (typeof res.favori_sayi !== 'undefined') {
+              $("#favori-sayi").text(res.favori_sayi);
+            } else {
+              $("#favori-sayi").text('0');
+            }
+          } else {
+            window.location.href = href;
+          }
+        },
+        error: function(){
+          window.location.href = href;
+        }
+      });
+  });
+
 });
 </script>
-
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
 

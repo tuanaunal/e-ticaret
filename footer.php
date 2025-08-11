@@ -141,4 +141,182 @@
   
 <p class="text-center small mt-5 mb-0">© 2025 Yakamoz Aksesuar. Tüm hakları saklıdır.</p>
 </div>
+
+  <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 1080">
+    <div id="bildirimToast" class="toast align-items-center text-white bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="d-flex">
+        <div class="toast-body" id="bildirimMesaji">İşlem başarılı.</div>
+        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Kapat"></button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  function bildirimGoster(mesaj, tema='success', sureMs=3000){
+    var toastEl = document.getElementById('bildirimToast');
+    var toastBody = document.getElementById('bildirimMesaji');
+    var renkSinifi = 'bg-success';
+    if(tema === 'primary') renkSinifi = 'bg-primary';
+    else if(tema === 'danger') renkSinifi = 'bg-danger';
+    else if(tema === 'secondary') renkSinifi = 'bg-secondary';
+    else if(tema === 'warning') renkSinifi = 'bg-warning text-dark';
+    else renkSinifi = 'bg-success';
+
+    toastEl.className = 'toast align-items-center text-white ' + renkSinifi + ' border-0';
+    toastBody.textContent = mesaj;
+
+    if (window.bootstrap && bootstrap.Toast) {
+      var toast = new bootstrap.Toast(toastEl, { delay: sureMs });
+      toast.show();
+    } else {
+      alert(mesaj);
+    }
+  }
+
+  function handleAjaxResponse(res, successMsg='İşlem başarılı ✅', successTema='success'){
+    try{
+      if(res && (res.ok === true || res.ok === 'true')){
+        bildirimGoster(successMsg, successTema);
+      }else{
+        var hata = (res && res.mesaj) ? res.mesaj : 'Bir şey ters gitti.';
+        bildirimGoster(hata, 'danger', 4000);
+      }
+    }catch(e){
+      bildirimGoster('Beklenmedik hata.', 'danger', 4000);
+    }
+  }
+
+  $(document).on('click', '.sepete-ekle-btn', function(e){
+    e.preventDefault();
+    var urun_id = $(this).data('id');
+    $.ajax({
+      url: 'sepete_ekle.php',
+      type: 'POST',
+      dataType: 'json',
+      data: { id: urun_id },
+      success: function(res){
+        handleAjaxResponse(res, 'Sepete eklendi ✅', 'primary');
+        if(res && typeof res.sepet_sayac !== 'undefined'){
+          $('.sepet-sayac').text(res.sepet_sayac);
+        }
+      },
+      error: function(){ bildirimGoster('Ağ hatası!', 'danger'); }
+    });
+  });
+
+  $(document).on('click', '.favoriye-ekle-btn', function(e){
+    e.preventDefault();
+    var urun_id = $(this).data('id');
+    $.ajax({
+      url: 'favori_ekle.php',
+      type: 'POST',
+      dataType: 'json',
+      data: { id: urun_id },
+      success: function(res){
+        handleAjaxResponse(res, 'Favorilere eklendi ❤️', 'success');
+        if(res && typeof res.favori_sayac !== 'undefined'){
+          $('.favori-sayac').text(res.favori_sayac);
+        }
+      },
+      error: function(){ bildirimGoster('Ağ hatası!', 'danger'); }
+    });
+  });
+
+  $(document).on('click', '.favoriden-kaldir-btn', function(e){
+    e.preventDefault();
+    var urun_id = $(this).data('id');
+    $.ajax({
+      url: 'favoriden_sil.php',
+      type: 'POST',
+      dataType: 'json',
+      data: { id: urun_id },
+      success: function(res){
+        handleAjaxResponse(res, 'Favorilerden kaldırıldı', 'secondary');
+        if(res && res.removeSelector){ $(res.removeSelector).remove(); }
+        if(res && typeof res.favori_sayac !== 'undefined'){
+          $('.favori-sayac').text(res.favori_sayac);
+        }
+      },
+      error: function(){ bildirimGoster('Ağ hatası!', 'danger'); }
+    });
+  });
+
+  $(document).on('click', '.favorileri-temizle-btn', function(e){
+    e.preventDefault();
+    $.ajax({
+      url: 'favorileri_temizle.php',
+      type: 'POST',
+      dataType: 'json',
+      success: function(res){
+        handleAjaxResponse(res, 'Favoriler temizlendi', 'secondary');
+        if(res && res.cleared === true){
+          $('.favori-liste').empty();
+          $('.favori-bos-mesaj').removeClass('d-none');
+          $('.favori-sayac').text('0');
+        }
+      },
+      error: function(){ bildirimGoster('Ağ hatası!', 'danger'); }
+    });
+  });
+
+  $(document).on('click', '.sepet-artir-btn', function(e){
+    e.preventDefault();
+    var sepet_id = $(this).data('id');
+    $.ajax({
+      url: 'sepet_artir.php', type: 'POST', dataType: 'json', data: { sepet_id },
+      success: function(res){
+        handleAjaxResponse(res, 'Adet artırıldı', 'success');
+        if(res && res.yeni_adet !== undefined){ $('.adet-' + sepet_id).text(res.yeni_adet); }
+        if(res && res.toplam !== undefined){ $('.sepet-toplam').text(res.toplam); }
+      },
+      error: function(){ bildirimGoster('Ağ hatası!', 'danger'); }
+    });
+  });
+
+  $(document).on('click', '.sepet-azalt-btn', function(e){
+    e.preventDefault();
+    var sepet_id = $(this).data('id');
+    $.ajax({
+      url: 'sepet_azalt.php', type: 'POST', dataType: 'json', data: { sepet_id },
+      success: function(res){
+        handleAjaxResponse(res, 'Adet azaltıldı', 'secondary');
+        if(res && res.yeni_adet !== undefined){ $('.adet-' + sepet_id).text(res.yeni_adet); }
+        if(res && res.toplam !== undefined){ $('.sepet-toplam').text(res.toplam); }
+        if(res && res.kaldir === true){ $('.sepet-kart-' + sepet_id).remove(); }
+      },
+      error: function(){ bildirimGoster('Ağ hatası!', 'danger'); }
+    });
+  });
+
+  $(document).on('click', '.sepet-sil-btn', function(e){
+    e.preventDefault();
+    var sepet_id = $(this).data('id');
+    $.ajax({
+      url: 'sepetten_sil.php', type: 'POST', dataType: 'json', data: { sepet_id },
+      success: function(res){
+        handleAjaxResponse(res, 'Sepetten kaldırıldı', 'secondary');
+        if(res && res.kaldir === true){ $('.sepet-kart-' + sepet_id).remove(); }
+        if(res && res.toplam !== undefined){ $('.sepet-toplam').text(res.toplam); }
+      },
+      error: function(){ bildirimGoster('Ağ hatası!', 'danger'); }
+    });
+  });
+
+  $(document).on('click', '.sepet-temizle-btn', function(e){
+    e.preventDefault();
+    $.ajax({
+      url: 'sepet_temizle.php', type: 'POST', dataType: 'json',
+      success: function(res){
+        handleAjaxResponse(res, 'Sepet temizlendi', 'secondary');
+        if(res && res.cleared === true){
+          $('.sepet-liste').empty();
+          $('.sepet-bos-mesaj').removeClass('d-none');
+          $('.sepet-sayac').text('0');
+          $('.sepet-toplam').text('0');
+        }
+      },
+      error: function(){ bildirimGoster('Ağ hatası!', 'danger'); }
+    });
+  });
+  </script>
 </footer>

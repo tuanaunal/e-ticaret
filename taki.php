@@ -73,62 +73,92 @@ $result = $conn->query($sql);
 </div>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
 <script>
 $(document).ready(function(){
-    $(".favori-btn").click(function(){
-        var urunId = $(this).data("id");
-        var btn = $(this);
 
-        $.ajax({
-            url: "favori_toggle.php",
-            type: "POST",
-            data: { urun_id: urunId },
-            success: function(response){
-                var data = JSON.parse(response);
+  $(".favori-btn").click(function(e){
+      e.preventDefault();
+      var urunId = $(this).data("id");
+      var btn = $(this);
 
-                if(data.status === "error" && data.redirect){
-                    window.location.href = data.redirect;
-                }
-
-                if(data.status === "success"){
-                    $("#favori-sayi").text(data.favori_sayi);
-
-                    if(data.action === "added"){
-                        btn.find("i").removeClass("bi-suit-heart").addClass("bi-suit-heart-fill");
-                    } else {
-                        btn.find("i").removeClass("bi-suit-heart-fill").addClass("bi-suit-heart");
-                    }
-                }
-            }
-        });
-    });
-
-    $(".sepete-ekle").click(function(e){
-        e.preventDefault(); 
-        var urunId = $(this).data("id");
-
-        $.ajax({
-            url: "sepet_ekle.php", 
-            type: "POST",
-            data: { urun_id: urunId },
-            success: function(response){
-                var data = JSON.parse(response);
-
-            if(data.status === "error" && data.redirect){
-                window.location.href = data.redirect;
+      $.ajax({
+          url: "favori_toggle.php",
+          type: "POST",
+          data: { urun_id: urunId },
+          success: function(response){
+              var data;
+              try { data = (typeof response === 'object') ? response : JSON.parse(response); }
+              catch(e){
+                if (typeof bildirimGoster === 'function') bildirimGoster('Beklenmedik cevap!', 'danger', 4000);
                 return;
-            }
+              }
 
-                if(data.status === "success"){
-                    if($("#sepet-sayi").length){
-                        $("#sepet-sayi").text(data.toplam_adet);
-                    }
-                } else {
-                    alert(data.message);
-                }
-            }
-        });
-    });
+              if(data.status === "error" && data.redirect){
+                  window.location.href = data.redirect;
+                  return;
+              }
+
+              if(data.status === "success"){
+                  if ($("#favori-sayi").length && typeof data.favori_sayi !== "undefined"){
+                      $("#favori-sayi").text(data.favori_sayi);
+                  }
+
+                  if(data.action === "added"){
+                      btn.find("i").removeClass("bi-suit-heart").addClass("bi-suit-heart-fill");
+                      if (typeof bildirimGoster === 'function') bildirimGoster("Favorilere eklendi ❤️", "success");
+                  } else {
+                      btn.find("i").removeClass("bi-suit-heart-fill").addClass("bi-suit-heart");
+                      if (typeof bildirimGoster === 'function') bildirimGoster("Favorilerden kaldırıldı", "secondary");
+                  }
+              } else {
+                  var hata = data.message || data.mesaj || "İşlem başarısız.";
+                  if (typeof bildirimGoster === 'function') bildirimGoster(hata, 'danger', 4000);
+              }
+          },
+          error: function(){
+              if (typeof bildirimGoster === 'function') bildirimGoster('Ağ hatası!', 'danger', 4000);
+          }
+      });
+  });
+
+  $(".sepete-ekle").click(function(e){
+      e.preventDefault();
+      var urunId = $(this).data("id");
+
+      $.ajax({
+          url: "sepet_ekle.php",
+          type: "POST",
+          data: { urun_id: urunId },
+          success: function(response){
+              var data;
+              try { data = (typeof response === 'object') ? response : JSON.parse(response); }
+              catch(e){
+                if (typeof bildirimGoster === 'function') bildirimGoster('Beklenmedik cevap!', 'danger', 4000);
+                return;
+              }
+
+              if(data.status === "error" && data.redirect){
+                  window.location.href = data.redirect;
+                  return;
+              }
+
+              if(data.status === "success"){
+                  if ($("#sepet-sayi").length && typeof data.toplam_adet !== "undefined"){
+                      $("#sepet-sayi").text(data.toplam_adet);
+                  }
+                  if (typeof bildirimGoster === 'function') bildirimGoster('Sepete eklendi ✅', 'primary');
+              } else {
+                  var hata = data.message || data.mesaj || "Sepete ekleme başarısız.";
+                  if (typeof bildirimGoster === 'function') bildirimGoster(hata, 'danger', 4000);
+              }
+          },
+          error: function(){
+              if (typeof bildirimGoster === 'function') bildirimGoster('Ağ hatası!', 'danger', 4000);
+          }
+      });
+  });
+
 });
 </script>
 

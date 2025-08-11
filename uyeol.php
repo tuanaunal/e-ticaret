@@ -16,7 +16,7 @@
 <body>
   <?php include 'navbar.php'; ?>
 
-  <div class="d-flex justify-content-center align-items-center" style="min-height: 80vh;">
+  <div class="d-flex justify-content-center align-items-center mt-4" style="min-height: 80vh;">
     <div class="card text-center shadow" style="width: 100%; max-width: 400px;">
       <div class="card-body">
         <h5 class="card-title mb-4">Üye Ol</h5>
@@ -57,7 +57,7 @@
               </label>
             </div>
             <div class="form-check mt-2 text-start">
-              <input class="form-check-input " type="checkbox" style="transform: scale(1.5);" required>
+              <input class="form-check-input" type="checkbox" style="transform: scale(1.5);" required>
               <label class="form-check-label">
                 Yakamoz Aksesuar tarafından kişisel verilerimin işlenmesine açık rıza veriyorum.
               </label>

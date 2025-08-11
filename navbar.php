@@ -1,9 +1,7 @@
 <?php
-
 if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
-
 include "db_baglanti.php";
 
 if (isset($_SESSION['uye_id'])) {
@@ -12,12 +10,12 @@ if (isset($_SESSION['uye_id'])) {
     $stmt = $conn->prepare("SELECT COUNT(*) AS toplam FROM favoriler WHERE uye_id = ?");
     $stmt->bind_param("i", $uye_id);
     $stmt->execute();
-    $favori_adet = $stmt->get_result()->fetch_assoc()['toplam'];
+    $favori_adet = (int)($stmt->get_result()->fetch_assoc()['toplam'] ?? 0);
 
-    $stmt = $conn->prepare("SELECT SUM(adet) AS toplam FROM sepet WHERE uye_id = ?");
+    $stmt = $conn->prepare("SELECT COALESCE(SUM(adet),0) AS toplam FROM sepet WHERE uye_id = ?");
     $stmt->bind_param("i", $uye_id);
     $stmt->execute();
-    $toplam_adet = $stmt->get_result()->fetch_assoc()['toplam'] ?? 0;
+    $toplam_adet = (int)($stmt->get_result()->fetch_assoc()['toplam'] ?? 0);
 } else {
     $favori_adet = 0;
     $toplam_adet = 0;
@@ -30,35 +28,37 @@ if (isset($_SESSION['uye_id'])) {
       
       <li class="nav-item me-3">
         <a class="nav-link position-relative" href="favoriler.php">
-            <i class="bi bi-suit-heart" style="font-size: 1.3rem; position: relative;"></i>
-            <span id="favori-sayi"
-                  class="badge rounded-pill"
-                  style="background-color: black; color: white; font-size: 0.5rem; padding: 1px 4px; position: absolute; top: 0; right: 0;">
-                <?php echo $favori_adet ?? 0; ?>
-            </span>
+          <i class="bi bi-suit-heart" style="font-size: 1.3rem; position: relative;"></i>
+          <span
+            id="favori-sayi"
+            class="favori-sayac badge rounded-pill"
+            style="background-color: black; color: white; font-size: 0.5rem; padding: 1px 4px; position: absolute; top: 0; right: 0;">
+            <?php echo $favori_adet; ?>
+          </span>
         </a>
       </li>
 
       <li class="nav-item me-3">
         <a class="nav-link position-relative" href="sepet.php">
-            <i class="bi bi-handbag" style="font-size: 1.3rem; position: relative;"></i>
-            <span id="sepet-sayi"
-                  class="badge rounded-pill"
-                  style="background-color: black; color: white; font-size: 0.5rem; padding: 1px 4px; position: absolute; top: 0; right: 0;">
-                <?php echo $toplam_adet ?? 0; ?>
-            </span>
+          <i class="bi bi-handbag" style="font-size: 1.3rem; position: relative;"></i>
+          <span
+            id="sepet-sayi"
+            class="sepet-sayac badge rounded-pill"
+            style="background-color: black; color: white; font-size: 0.5rem; padding: 1px 4px; position: absolute; top: 0; right: 0;">
+            <?php echo $toplam_adet; ?>
+          </span>
         </a>
       </li>
 
       <li class="nav-item dropdown me-3">
         <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown"
-          aria-expanded="false">
+           aria-expanded="false">
           <i class="bi bi-person" style="font-size: 1.5rem;"></i>
         </a>
         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
           <?php if (isset($_SESSION['uye_id'])): ?>
             <li class="dropdown-item fw-bold" style="font-family: 'Playfair Display', serif;">
-              Merhaba, <?php echo $_SESSION['uye_ad']; ?>
+              Merhaba, <?php echo htmlspecialchars($_SESSION['uye_ad'] ?? ''); ?>
             </li>
             <li><a class="dropdown-item" style="font-family: 'Playfair Display', serif;" href="hesabim.php">Hesabım</a></li>
             <li><a class="dropdown-item" style="font-family: 'Playfair Display', serif;" href="siparislerim.php">Siparişlerim</a></li>

@@ -73,6 +73,12 @@ $result = $conn->query($sql);
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
+function bildirimGoster(mesaj, tur, sure = 3000) {
+    var bildirim = $('<div class="alert alert-' + tur + ' position-fixed top-0 start-50 translate-middle-x mt-3" style="z-index:9999;">' + mesaj + '</div>');
+    $("body").append(bildirim);
+    setTimeout(function(){ bildirim.fadeOut(function(){ $(this).remove(); }); }, sure);
+}
+
 $(document).ready(function(){
     $(".favori-btn").click(function(){
         var urunId = $(this).data("id");
@@ -94,8 +100,10 @@ $(document).ready(function(){
 
                     if(data.action === "added"){
                         btn.find("i").removeClass("bi-suit-heart").addClass("bi-suit-heart-fill");
+                        bildirimGoster("Favorilere eklendi ❤️", "success");
                     } else {
                         btn.find("i").removeClass("bi-suit-heart-fill").addClass("bi-suit-heart");
+                        bildirimGoster("Favorilerden kaldırıldı", "secondary");
                     }
                 }
             }
@@ -113,15 +121,16 @@ $(document).ready(function(){
             success: function(response){
                 var data = JSON.parse(response);
 
-            if(data.status === "error" && data.redirect){
-                window.location.href = data.redirect;
-                return;
-            }
+                if(data.status === "error" && data.redirect){
+                    window.location.href = data.redirect;
+                    return;
+                }
 
                 if(data.status === "success"){
                     if($("#sepet-sayi").length){
                         $("#sepet-sayi").text(data.toplam_adet);
                     }
+                    bildirimGoster("Sepete eklendi ✅", "primary");
                 } else {
                     alert(data.message);
                 }
