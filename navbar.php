@@ -60,11 +60,23 @@ if (isset($_SESSION['uye_id'])) {
             <li class="dropdown-item fw-bold" style="font-family: 'Playfair Display', serif;">
               Merhaba, <?php echo htmlspecialchars($_SESSION['uye_ad'] ?? ''); ?>
             </li>
-            <li><a class="dropdown-item" style="font-family: 'Playfair Display', serif;" href="hesabim.php">Hesabım</a></li>
-            <li><a class="dropdown-item" style="font-family: 'Playfair Display', serif;" href="siparislerim.php">Siparişlerim</a></li>
-            <li><a class="dropdown-item" style="font-family: 'Playfair Display', serif;" href="sifre_degistir.php">Şifre Değiştir</a></li>
-            <li><hr class="dropdown-divider"></li>
-            <li><a class="dropdown-item" style="font-family: 'Playfair Display', serif;" href="cikis.php">Çıkış Yap</a></li>
+
+            <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin'): ?>
+              <!-- Admin menüsü -->
+              <li><a class="dropdown-item" style="font-family: 'Playfair Display', serif;" href="hesabim.php">Hesabım</a></li>
+              <li><a class="dropdown-item" style="font-family: 'Playfair Display', serif;" href="http://localhost:8888/AKSESUAR-SHOP/admin/admin_panel.php">Admin Paneli</a></li>
+              <li><a class="dropdown-item" style="font-family: 'Playfair Display', serif;" href="sifre_degistir.php">Şifre Değiştir</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item" style="font-family: 'Playfair Display', serif;" href="cikis.php">Çıkış Yap</a></li>
+            <?php else: ?>
+              <!-- Normal kullanıcı menüsü -->
+              <li><a class="dropdown-item" style="font-family: 'Playfair Display', serif;" href="hesabim.php">Hesabım</a></li>
+              <li><a class="dropdown-item" style="font-family: 'Playfair Display', serif;" href="siparislerim.php">Siparişlerim</a></li>
+              <li><a class="dropdown-item" style="font-family: 'Playfair Display', serif;" href="sifre_degistir.php">Şifre Değiştir</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item" style="font-family: 'Playfair Display', serif;" href="cikis.php">Çıkış Yap</a></li>
+            <?php endif; ?>
+
           <?php else: ?>
             <li><a class="dropdown-item" style="font-family: 'Playfair Display', serif;" href="girisyap.php">Giriş Yap</a></li>
             <li><a class="dropdown-item" style="font-family: 'Playfair Display', serif;" href="uyeol.php">Üye Ol</a></li>

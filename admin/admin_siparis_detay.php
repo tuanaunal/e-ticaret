@@ -1,6 +1,11 @@
 <?php
-session_start();
-include("db_baglanti.php");
+if (session_status() === PHP_SESSION_NONE) { session_start(); }
+include("../db_baglanti.php");
+
+if (!isset($_SESSION['uye_id']) || ($_SESSION['role'] ?? '') !== 'admin') {
+    header("Location: ../girisyap.php");
+    exit();
+}
 
 if (!isset($_GET["id"])) {
     echo "Sipariş ID bulunamadı.";
@@ -9,7 +14,7 @@ if (!isset($_GET["id"])) {
 
 $siparis_id = intval($_GET["id"]);
 
-$sorgu = $conn->prepare("SELECT s.*, u.ad_soyad AS musteri_ad, u.email 
+$sorgu = $conn->prepare("SELECT s.*, CONCAT(u.ad, ' ', u.soyad) AS musteri_ad, u.email 
                          FROM siparis s 
                          JOIN uye u ON s.uye_id = u.uye_id 
                          WHERE s.siparis_id = ?");

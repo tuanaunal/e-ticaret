@@ -1,9 +1,9 @@
 <?php
-session_start();
+if (session_status() === PHP_SESSION_NONE) { session_start(); }
 include '../db_baglanti.php';
 
-if (!isset($_SESSION['admin'])) {
-    header("Location: admin_giris.php");
+if (!isset($_SESSION['uye_id']) || ($_SESSION['role'] ?? '') !== 'admin') {
+    header("Location: ../girisyap.php");
     exit();
 }
 

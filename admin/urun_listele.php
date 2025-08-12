@@ -1,15 +1,18 @@
 <?php
-session_start();
+if (session_status() === PHP_SESSION_NONE) { session_start(); }
 include '../db_baglanti.php';
 
-if (!isset($_SESSION['admin'])) {
-    header("Location: admin_giris.php");
+if (!isset($_SESSION['uye_id']) || ($_SESSION['role'] ?? '') !== 'admin') {
+    header("Location: ../girisyap.php");
     exit();
 }
 
 if (empty($_SESSION['csrf'])) {
     $_SESSION['csrf'] = bin2hex(random_bytes(16));
 }
+
+$mesaj = "";
+$mesaj_tur = "";
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['sil_id'])) {
     if (!isset($_POST['csrf']) || !hash_equals($_SESSION['csrf'], $_POST['csrf'])) {
@@ -22,11 +25,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['sil_id'])) {
         $res->bind_param("i", $sil_id);
         $res->execute();
         $resRow = $res->get_result()->fetch_assoc();
+        $resim_yolu = !empty($resRow['resim']) ? "../resimler/" . $resRow['resim'] : null;
 
         $stmt = $conn->prepare("DELETE FROM urun WHERE urun_id = ?");
         $stmt->bind_param("i", $sil_id);
         if ($stmt->execute()) {
-            $mesaj = "Ürün silindi.";
+            if ($resim_yolu && file_exists($resim_yolu)) {
+                unlink($resim_yolu);
+            }
+            $mesaj = "Ürün başarıyla silindi.";
             $mesaj_tur = "success";
         } else {
             $mesaj = "Silme sırasında hata oluştu.";
@@ -50,22 +57,22 @@ $result = $conn->query($sql);
 <html lang="tr">
 <head>
 <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="keywords" content="Aksesuar,Takı,Gözlük,Şapka,Çanta,Toka,Saç Aksesuarı">
-  <meta name="description" content="Yakamoz Aksesuar – Admin Girişi">
-  <link rel="icon" type="image/png" href="../YA-Dükkan Resimleri/icon.png">
-  <title>Admin Ürün Listele - Yakamoz Aksesuar</title>
-  <link rel="stylesheet" href="../style.css">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
-  <style>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="keywords" content="Aksesuar,Takı,Gözlük,Şapka,Çanta,Toka,Saç Aksesuarı">
+<meta name="description" content="Yakamoz Aksesuar – Admin Ürün Listele">
+<link rel="icon" type="image/png" href="../YA-Dükkan Resimleri/icon.png">
+<title>Admin Ürün Listele - Yakamoz Aksesuar</title>
+<link rel="stylesheet" href="../style.css">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+<style>
     body { background:#f8f9fa; }
     .panel-card { max-width:1200px; width:100%; border-radius:1rem; box-shadow:0 10px 25px rgba(0,0,0,.08); }
     .urun-thumb { width:70px; height:70px; object-fit:cover; border-radius:.5rem; }
     .table td, .table th { vertical-align: middle; }
     .nowrap { white-space: nowrap; }
     .badge-light { background:#f1f3f5; color:#495057; border:1px solid #dee2e6; }
-  </style>
+</style>
 </head>
 <body>
 
@@ -115,7 +122,7 @@ $result = $conn->query($sql);
                     echo $badges ? implode(' ', $badges) : '<span class="badge badge-light">—</span>';
                   ?>
                 </td>
-
+                
                 <td class="nowrap"><?= number_format((float)$row['fiyat'], 2) ?></td>
                 <td><?= (int)$row['stok'] ?></td>
                 <td class="text-center">

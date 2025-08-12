@@ -1,10 +1,9 @@
 <?php
-session_start();
+if (session_status() === PHP_SESSION_NONE) { session_start(); }
 include '../db_baglanti.php';
 
-
-if (!isset($_SESSION['admin'])) {
-    header("Location: admin_giris.php");
+if (!isset($_SESSION['uye_id']) || ($_SESSION['role'] ?? '') !== 'admin') {
+    header("Location: ../girisyap.php");
     exit();
 }
 ?>
@@ -29,9 +28,7 @@ if (!isset($_SESSION['admin'])) {
       box-shadow: 0 10px 25px rgba(0,0,0,.08);
     }
     .panel-title { font-family: 'Playfair Display', serif; }
-    .action-btn {
-      min-width: 190px;
-    }
+    .action-btn { min-width: 190px; }
   </style>
 </head>
 <body>
@@ -40,48 +37,52 @@ if (!isset($_SESSION['admin'])) {
     <div class="card panel-card p-4">
       <div class="d-flex justify-content-between align-items-center mb-3">
         <h2 class="panel-title m-0">Admin Paneli</h2>
-        <span class="text-muted small">Hoş geldiniz, <strong><?= htmlspecialchars($_SESSION['admin']) ?></strong></span>
+        <span class="text-muted small">
+         Hoş geldiniz, 
+          <strong>
+            <?= htmlspecialchars(($_SESSION['uye_ad'] ?? $_SESSION['ad'] ?? '') . ' ' . ($_SESSION['uye_soyad'] ?? $_SESSION['soyad'] ?? '')) ?>
+          </strong>
+        </span>
+
       </div>
 
       <hr class="my-3">
 
       <div class="row g-3 justify-content-center">
-  <div class="col-6 d-grid">
-    <a href="kategori_ekle.php" class="btn btn-primary action-btn">
-      <i class="bi bi-folder-plus me-1"></i> Kategori Ekle
-    </a>
-  </div>
-  <div class="col-6 d-grid">
-    <a href="urun_ekle.php" class="btn btn-success action-btn">
-      <i class="bi bi-plus-circle me-1"></i> Ürün Ekle
-    </a>
-  </div>
-  <div class="col-6 d-grid">
-    <a href="urun_listele.php" class="btn btn-info text-white action-btn">
-      <i class="bi bi-card-list me-1"></i> Ürünleri Listele
-    </a>
-  </div>
-  <div class="col-6 d-grid">
-    <a href="admin_siparisler.php" class="btn btn-warning action-btn">
-      <i class="bi bi-receipt me-1"></i> Siparişleri Yönet
-    </a>
-  </div>
+        <div class="col-6 d-grid">
+          <a href="kategori_ekle.php" class="btn btn-primary action-btn">
+            <i class="bi bi-folder-plus me-1"></i> Kategori Ekle
+          </a>
+        </div>
+        <div class="col-6 d-grid">
+          <a href="urun_ekle.php" class="btn btn-success action-btn">
+            <i class="bi bi-plus-circle me-1"></i> Ürün Ekle
+          </a>
+        </div>
+        <div class="col-6 d-grid">
+          <a href="urun_listele.php" class="btn btn-info text-white action-btn">
+            <i class="bi bi-card-list me-1"></i> Ürünleri Listele
+          </a>
+        </div>
+        <div class="col-6 d-grid">
+          <a href="admin_siparisler.php" class="btn btn-warning action-btn">
+            <i class="bi bi-receipt me-1"></i> Siparişleri Yönet
+          </a>
+        </div>
+        <div class="col-6 d-grid">
+          <a href="admin_kullanicilar.php" class="btn btn-secondary action-btn">
+            <i class="bi bi-people-fill me-1"></i> Kullanıcıları Yönet
+          </a>
+        </div>
+        <div class="col-6 d-grid">
+          <a href="../index.php" class="btn btn-danger btn-sm">
+           <i class="bi bi-arrow-left"></i> Ana Sayfaya Dön
+          </a>
+        </div>
+      </div>
 
-  <div class="col-6 d-grid">
-    <a href="admin_kullanicilar.php" class="btn btn-secondary action-btn">
-      <i class="bi bi-people-fill me-1"></i> Kullanıcıları Yönet
-    </a>
-  </div>
-
-  <div class="col-6 d-grid">
-    <a href="admin_cikis.php" class="btn btn-danger action-btn">
-      <i class="bi bi-box-arrow-right me-1"></i> Çıkış Yap
-    </a>
-  </div>
-</div>
-
-   </div>
-
+    </div>
+    
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>

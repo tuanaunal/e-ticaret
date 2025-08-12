@@ -6,8 +6,11 @@ $aktifSekme = (isset($_GET['tab']) && $_GET['tab'] === 'register') ? 'register' 
 
 $redirect = isset($_GET['redirect']) ? trim($_GET['redirect']) : (isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : 'index.php');
 
-$flashError = isset($_GET['error']) ? $_GET['error'] : '';
-$flashOk    = isset($_GET['success']) ? $_GET['success'] : '';
+$flashError = isset($_GET['error']) ? $_GET['error'] : (isset($_SESSION['giris_hata']) ? $_SESSION['giris_hata'] : '');
+$flashOk    = isset($_GET['success']) ? $_GET['success'] : (isset($_SESSION['giris_ok']) ? $_SESSION['giris_ok'] : '');
+
+if (isset($_SESSION['giris_hata'])) unset($_SESSION['giris_hata']);
+if (isset($_SESSION['giris_ok']))   unset($_SESSION['giris_ok']);
 ?>
 <!DOCTYPE html>
 <html lang="tr">
